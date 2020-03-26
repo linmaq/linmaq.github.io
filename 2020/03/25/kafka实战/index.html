@@ -6,21 +6,22 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://linmaq.github.io">
-  <title>Archives: 2020/3 | 冬生草的学习之旅</title>
+  <title>冬生草的学习之旅</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="个人学习博客">
+  <meta name="description" content="kafka急速入门与核心API解析 kafka环境安装 上面我们已经对kafka的基本概念、核心思想有了一定的了解和认知，并且掌握了kafka在实际工作中的一些主要的应用场景。那么接下来，我们就一起快速进入kafka的安装吧。  kafka下载地址：http://kafka.apache.org/downloads.html  kafka安装步骤：首先kafka安装需要依赖与zookeeper，">
 <meta name="keywords" content="Java,spring全家桶,html5">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="冬生草的学习之旅">
-<meta property="og:url" content="https://linmaq.github.io/archives/2020/03/index.html">
+<meta property="og:url" content="https://linmaq.github.io/2020/03/25/kafka实战/index.html">
 <meta property="og:site_name" content="冬生草的学习之旅">
-<meta property="og:description" content="个人学习博客">
+<meta property="og:description" content="kafka急速入门与核心API解析 kafka环境安装 上面我们已经对kafka的基本概念、核心思想有了一定的了解和认知，并且掌握了kafka在实际工作中的一些主要的应用场景。那么接下来，我们就一起快速进入kafka的安装吧。  kafka下载地址：http://kafka.apache.org/downloads.html  kafka安装步骤：首先kafka安装需要依赖与zookeeper，">
 <meta property="og:locale" content="en">
+<meta property="og:updated_time" content="2020-03-25T12:34:06.892Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="冬生草的学习之旅">
-<meta name="twitter:description" content="个人学习博客">
+<meta name="twitter:description" content="kafka急速入门与核心API解析 kafka环境安装 上面我们已经对kafka的基本概念、核心思想有了一定的了解和认知，并且掌握了kafka在实际工作中的一些主要的应用场景。那么接下来，我们就一起快速进入kafka的安装吧。  kafka下载地址：http://kafka.apache.org/downloads.html  kafka安装步骤：首先kafka安装需要依赖与zookeeper，">
   
     <link rel="alternative" href="/atom.xml" title="冬生草的学习之旅" type="application/atom+xml">
   
@@ -185,233 +186,212 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-kafka实战" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+  <div class="article-entry" itemprop="articleBody">
+    
+    <p> kafka急速入门与核心API解析</p>
+<h3 id="kafka环境安装"><a href="#kafka环境安装" class="headerlink" title="kafka环境安装"></a>kafka环境安装</h3><hr>
+<p>上面我们已经对kafka的基本概念、核心思想有了一定的了解和认知，并且掌握了kafka在实际工作中的一些主要的应用场景。那么接下来，我们就一起快速进入kafka的安装吧。</p>
+<ul>
+<li><p>kafka下载地址：<a href="http://kafka.apache.org/downloads.html" target="_blank" rel="noopener">http://kafka.apache.org/downloads.html</a></p>
+</li>
+<li><p>kafka安装步骤：首先kafka安装需要依赖与zookeeper，所以小伙伴们先准备好zookeeper环境（三个节点即可），然后我们来一起构建kafka broker。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># 解压命令：</span><br><span class="line">tar -zxvf kafka_2.12-2.1.0.tgz -C /usr/local/</span><br><span class="line"><span class="meta">#</span># 改名命令：</span><br><span class="line">mv kafka_2.12-2.1.0/ kafka_2.12</span><br><span class="line"><span class="meta">#</span># 进入解压后的目录，修改server.properties文件：</span><br><span class="line">vim /usr/local/kafka_2.12/config/server.properties</span><br><span class="line"><span class="meta">#</span># 修改配置：</span><br><span class="line">broker.id=0</span><br><span class="line">port=9092</span><br><span class="line">host.name=192.168.11.51</span><br><span class="line">advertised.host.name=192.168.11.51</span><br><span class="line">log.dirs=/usr/local/kafka_2.12/kafka-logs</span><br><span class="line">num.partitions=2</span><br><span class="line">zookeeper.connect=192.168.11.111:2181,192.168.11.112:2181,192.168.11.113:2181</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 建立日志文件夹：</span><br><span class="line">mkdir /usr/local/kafka_2.12/kafka-logs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>#启动kafka：</span><br><span class="line">/usr/local/kafka_2.12/bin/kafka-server-start.sh /usr/local/kafka_2.12/config/server.properties &amp;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="kafka常用命令"><a href="#kafka常用命令" class="headerlink" title="kafka常用命令"></a>kafka常用命令</h3><hr>
+<p>我们接下来一起了解几个非常重要的命令，通过这些命令我们对kafka topic partition 进行查看和操作。</p>
+<ul>
+<li><p>常用命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># 简单操作：</span><br><span class="line"><span class="meta">#</span>（1）创建topic主题命令：（创建名为test的topic， 1个分区分别存放数据，数据备份总共1份）</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --create --topic topic1 --partitions 1  --replication-factor 1  </span><br><span class="line"><span class="meta">#</span># --zookeeper 为zk服务列表</span><br><span class="line"><span class="meta">#</span># --create 命令后 --topic 为创建topic 并指定 topic name</span><br><span class="line"><span class="meta">#</span># --partitions 为指定分区数量</span><br><span class="line"><span class="meta">#</span># --replication-factor 为指定副本集数量</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（2）查看topic列表命令：</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --list</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（3）kafka命令发送数据：（然后我们就可以编写数据发送出去了）</span><br><span class="line">kafka-console-producer.sh --broker-list 192.168.11.51:9092 --topic topic1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（4）kafka命令接受数据：（然后我们就可以看到消费的信息了）</span><br><span class="line">kafka-console-consumer.sh --bootstrap-server 192.168.11.51:9092 --topic topic1 --from-beginning</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（5）删除topic命令：</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --delete --topic topic1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（6）kafka查看消费进度：（当我们需要查看一个消费者组的消费进度时，则使用下面的命令）</span><br><span class="line">kafka-consumer-groups.sh --bootstrap-server 192.168.11.51:9092 --describe --group group1</span><br><span class="line"><span class="meta">#</span># --describe --group 为订阅组， 后面指定 group name</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="急速入门"><a href="#急速入门" class="headerlink" title="急速入门"></a>急速入门</h3><hr>
+<p>下面我们一起使用kafka最基本的API来对kafka进行操作！</p>
+<ul>
+<li><p>kafka依赖包：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kafka_2.12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>kafka生产者：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.bfxy.mix.kafka;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.Callback;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.KafkaProducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.ProducerRecord;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.RecordMetadata;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectKafkaProducer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个kafka生产者</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> KafkaProducer&lt;String, String&gt; producer;</span><br><span class="line">	<span class="comment">// 定义一个成员变量为topic</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line">    </span><br><span class="line">     <span class="comment">// 初始化kafka的配置文件和实例：Properties &amp; KafkaProducer</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CollectKafkaProducer</span><span class="params">(String topic)</span> </span>&#123; </span><br><span class="line">		Properties props = <span class="keyword">new</span> Properties(); </span><br><span class="line">         <span class="comment">// 配置broker地址</span></span><br><span class="line">		props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"192.168.11.51:9092"</span>); </span><br><span class="line">         <span class="comment">// 定义一个 client.id</span></span><br><span class="line">		props.put(<span class="string">"client.id"</span>, <span class="string">"demo-producer-test"</span>); </span><br><span class="line">		</span><br><span class="line">         <span class="comment">// 其他配置项：</span></span><br><span class="line">        </span><br><span class="line"><span class="comment">//		props.put("batch.size", 16384);			//16KB -&gt; 满足16KB发送批量消息</span></span><br><span class="line"><span class="comment">//		props.put("linger.ms", 10); 			//10ms -&gt; 满足10ms时间间隔发送批量消息</span></span><br><span class="line"><span class="comment">//		props.put("buffer.memory", 33554432);	 //32M -&gt; 缓存提性能</span></span><br><span class="line">		</span><br><span class="line">         <span class="comment">// kafka 序列化配置：</span></span><br><span class="line">		props.put(<span class="string">"key.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>); </span><br><span class="line">		props.put(<span class="string">"value.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>); </span><br><span class="line">         </span><br><span class="line">         <span class="comment">// 创建 KafkaProducer 与 接收 topic</span></span><br><span class="line">		<span class="keyword">this</span>.producer = <span class="keyword">new</span> KafkaProducer&lt;&gt;(props);</span><br><span class="line">		<span class="keyword">this</span>.topic = topic; </span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送消息 （同步或者异步）</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(Object message, <span class="keyword">boolean</span> syncSend)</span> <span class="keyword">throws</span> InterruptedException </span>&#123; </span><br><span class="line">		<span class="keyword">try</span> &#123; </span><br><span class="line">             <span class="comment">// 同步发送</span></span><br><span class="line">			<span class="keyword">if</span>(syncSend) &#123;</span><br><span class="line">				producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, JSON.toJSONString(message)));		</span><br><span class="line">			&#125; </span><br><span class="line">             <span class="comment">// 异步发送（callback实现回调监听）</span></span><br><span class="line">             <span class="keyword">else</span> &#123;</span><br><span class="line">				producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, </span><br><span class="line">                              JSON.toJSONString(message)), </span><br><span class="line">                              <span class="keyword">new</span> Callback() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompletion</span><span class="params">(RecordMetadata recordMetadata, Exception e)</span> </span>&#123;</span><br><span class="line">	                    <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">	                        System.err.println(<span class="string">"Unable to write to Kafka in CollectKafkaProducer ["</span> + topic + <span class="string">"] exception: "</span> + e);</span><br><span class="line">	                    &#125;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);				</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			e.printStackTrace(); </span><br><span class="line">		&#125; </span><br><span class="line">	&#125; </span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 关闭producer</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		producer.close();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试函数</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">		String topic = <span class="string">"topic1"</span>;</span><br><span class="line">		CollectKafkaProducer collectKafkaProducer = <span class="keyword">new</span> CollectKafkaProducer(topic);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">10</span>; i ++) &#123;</span><br><span class="line">			User user = <span class="keyword">new</span> User();</span><br><span class="line">			user.setId(i+<span class="string">""</span>);</span><br><span class="line">			user.setName(<span class="string">"张三"</span>);</span><br><span class="line">			collectKafkaProducer.send(user, <span class="keyword">true</span>);</span><br><span class="line">		&#125;</span><br><span class="line">        </span><br><span class="line">		Thread.sleep(Integer.MAX_VALUE);</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>kafka消费者：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.bfxy.mix.kafka;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerConfig;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRebalanceListener;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecord;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecords;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.KafkaConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.OffsetAndMetadata;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.common.TopicPartition;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> kafka.consumer.Consumer;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectKafkaConsumer</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 定义消费者实例</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> KafkaConsumer&lt;String, String&gt; consumer;</span><br><span class="line">	<span class="comment">// 定义消费主题</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     <span class="comment">// 消费者初始化</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CollectKafkaConsumer</span><span class="params">(String topic)</span> </span>&#123; </span><br><span class="line">		Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">         <span class="comment">// 消费者的zookeeper 地址配置</span></span><br><span class="line">		props.put(<span class="string">"zookeeper.connect"</span>, <span class="string">"192.168.11.111:2181"</span>); </span><br><span class="line">         <span class="comment">// 消费者的broker 地址配置</span></span><br><span class="line">		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="string">"192.168.11.51:9092"</span>);</span><br><span class="line">		<span class="comment">// 消费者组定义</span></span><br><span class="line">         props.put(ConsumerConfig.GROUP_ID_CONFIG, <span class="string">"demo-group-id"</span>); </span><br><span class="line">         <span class="comment">// 是否自动提交（auto commit，一般生产环境均设置为false，则为手工确认）</span></span><br><span class="line">		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, <span class="string">"false"</span>);</span><br><span class="line">         <span class="comment">// 自动提交配置项</span></span><br><span class="line"><span class="comment">//		props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");</span></span><br><span class="line">         <span class="comment">// 消费进度（位置 offset）重要设置: latest,earliest </span></span><br><span class="line">		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, <span class="string">"earliest"</span>);</span><br><span class="line">         <span class="comment">// 超时时间配置</span></span><br><span class="line">		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, <span class="string">"30000"</span>); </span><br><span class="line">		<span class="comment">// kafka序列化配置</span></span><br><span class="line">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>); </span><br><span class="line">		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>); </span><br><span class="line">        </span><br><span class="line">         <span class="comment">// 创建consumer对象 &amp; 赋值topic</span></span><br><span class="line">		consumer = <span class="keyword">new</span> KafkaConsumer&lt;&gt;(props); </span><br><span class="line">		<span class="keyword">this</span>.topic = topic; </span><br><span class="line">         <span class="comment">// 订阅消费主题</span></span><br><span class="line">		consumer.subscribe(Collections.singletonList(topic));</span><br><span class="line">		</span><br><span class="line">	&#125; </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 循环拉取消息并进行消费，手工ACK方式</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(KafkaConsumer&lt;String, String&gt; consumer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 	拉取结果集(拉取超时时间为1秒)</span></span><br><span class="line">        	ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">1000</span>);</span><br><span class="line">            <span class="comment">//  拉取结果集后获取具体消息的主题名称 分区位置 消息数量</span></span><br><span class="line">            <span class="keyword">for</span> (TopicPartition partition : records.partitions()) &#123;</span><br><span class="line">                List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords = records.records(partition);</span><br><span class="line">                String topic = partition.topic();</span><br><span class="line">                <span class="keyword">int</span> size = partitionRecords.size();</span><br><span class="line">                log.info(<span class="string">"获取topic:&#123;&#125;,分区位置:&#123;&#125;,消息数为:&#123;&#125;"</span>, topic, partition.partition(), size);</span><br><span class="line">            	<span class="comment">// 分别对每个partition进行处理</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; size; i++) &#123;</span><br><span class="line">                	System.err.println(<span class="string">"-----&gt; value: "</span> + partitionRecords.get(i).value());</span><br><span class="line">                    <span class="keyword">long</span> offset = partitionRecords.get(i).offset() + <span class="number">1</span>;</span><br><span class="line">                	<span class="comment">// consumer.commitSync(); // 这种提交会自动获取partition 和 offset </span></span><br><span class="line">                     <span class="comment">// 这种是显示提交partition 和 offset 进度</span></span><br><span class="line">				   consumer.commitSync(Collections.singletonMap(partition, </span><br><span class="line">                                                            <span class="keyword">new</span> OffsetAndMetadata(offset)));</span><br><span class="line">                    log.info(<span class="string">"同步成功, topic: &#123;&#125;, 提交的 offset: &#123;&#125; "</span>, topic, offset);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 测试函数</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		String topic = <span class="string">"topic1"</span>;</span><br><span class="line">		CollectKafkaConsumer collectKafkaConsumer = <span class="keyword">new</span> CollectKafkaConsumer(topic);</span><br><span class="line">		collectKafkaConsumer.receive(collectKafkaConsumer.consumer);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    
+
+    
+    <div class="page-reward">
+      <a href="javascript:void(0);" class="page-reward-btn tooltip-top" target="_self">
+        <div class="tooltip tooltip-east">
+          <span class="tooltip-item">
+            赏
+          </span>
+          <span class="tooltip-content">
+            <span class="tooltip-text">
+              <span class="tooltip-inner">
+                <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i
+                    class="icon icon-quo-right"></i></p>
+                <div class="reward-box">
+                  
+                  <div class="reward-box-item">
+                    <img class="reward-img" src="/img/alipay.png">
+                    <span class="reward-type">支付宝</span>
+                  </div>
+                  
+                  
+                  <div class="reward-box-item">
+                    <img class="reward-img" src="/img/weixin.png">
+                    <span class="reward-type">微信</span>
+                  </div>
+                  
+                </div>
+              </span>
+            </span>
+          </span>
+        </div>
+      </a>
+    </div>
+    
+
+    
+    <div class="declare"> 
+      <ul class="post-copyright">
+        <li>
+          <strong>本文作者：</strong>
+          冬生草
+        </li>
+        <li>
+          <strong>本文链接：</strong>
+          <a href="https://linmaq.github.io/2020/03/25/kafka实战/" title="" target="_blank">https://linmaq.github.io/2020/03/25/kafka实战/</a>
+        </li>
+        <li>
+          <strong>版权声明： </strong>
+          本博客所有文章除特别声明外，均采用 <a href="https://www.apache.org/licenses/LICENSE-2.0.html" rel="external nofollow" target="_blank">Apache License 2.0</a> 许可协议。转载请注明出处！
+        </li>
+      </ul>
+    </div>
+    
+
+  </div>
+  <div class="article-info article-info-index">
     
     
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
     
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/GC and Tuning_2/" class="archive-article-date">
-        <time datetime="2020-03-26T12:01:53.825Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
 
+    
+
+    
+    
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <!-- <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a> -->
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-    	 
+      </div>
+    </span>
+  </div>
+</div>
 
-        <div class="article-info info-on-right">
-          
-          
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://linmaq.github.io/2020/03/25/kafka实战/" alt="微信分享二维码"> -->
+    </div>
+</div>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+<div class="mask js-mask"></div>
+
+    
+    <div class="clearfix"></div>
+  </div>
   </div>
 </article>
+
+
+<nav id="article-nav">
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/GC and Tuning_1/" class="archive-article-date">
-        <time datetime="2020-03-26T12:01:53.803Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/gc ZGC_3/" class="archive-article-date">
-        <time datetime="2020-03-26T11:56:32.481Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/RocketMQ/" class="archive-article-date">
-        <time datetime="2020-03-25T13:15:32.947Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/Active MQ原理/" class="archive-article-date">
-        <time datetime="2020-03-25T13:13:51.313Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/kafka实战/" class="archive-article-date">
-        <time datetime="2020-03-25T12:33:17.554Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/Kafka/" class="archive-article-date">
-        <time datetime="2020-03-25T12:32:48.597Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/11/重装系统后登录hexo博客/" class="archive-article-date">
-        <time datetime="2020-03-11T06:00:20.436Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-11</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2020/03/11/重装系统后登录hexo博客/" target="_blank">重装系统后登录hexo博客</a>
-  
-    </h1>
-  
-
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo 重装系统</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+    <a href="/2020/03/25/Active MQ原理/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/03/25/Kafka/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
   
+</nav>
 
-    
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           </div>
@@ -452,8 +432,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,

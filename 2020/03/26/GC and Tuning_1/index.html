@@ -6,21 +6,27 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://linmaq.github.io">
-  <title>Archives: 2020/3 | 冬生草的学习之旅</title>
+  <title>冬生草的学习之旅</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="个人学习博客">
+  <meta name="description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete c/C++ 手动回收内存 Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如">
 <meta name="keywords" content="Java,spring全家桶,html5">
-<meta property="og:type" content="website">
+<meta property="og:type" content="article">
 <meta property="og:title" content="冬生草的学习之旅">
-<meta property="og:url" content="https://linmaq.github.io/archives/2020/03/index.html">
+<meta property="og:url" content="https://linmaq.github.io/2020/03/26/GC and Tuning_1/index.html">
 <meta property="og:site_name" content="冬生草的学习之旅">
-<meta property="og:description" content="个人学习博客">
+<meta property="og:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete c/C++ 手动回收内存 Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如">
 <meta property="og:locale" content="en">
+<meta property="og:image" content="https://linmaq.github.io/2020/03/26/GC%20and%20Tuning_1/%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3.png">
+<meta property="og:image" content="https://linmaq.github.io/2020/03/26/GC%20and%20Tuning_1/%E5%B8%B8%E7%94%A8%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8.png">
+<meta property="og:image" content="https://linmaq.github.io/2020/03/26/GC%20and%20Tuning_1/GC%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3.png">
+<meta property="og:image" content="https://linmaq.github.io/2020/03/26/GC%20and%20Tuning_1/GCHeapDump.png">
+<meta property="og:updated_time" content="2020-03-21T08:02:06.165Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="冬生草的学习之旅">
-<meta name="twitter:description" content="个人学习博客">
+<meta name="twitter:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete c/C++ 手动回收内存 Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如">
+<meta name="twitter:image" content="https://linmaq.github.io/2020/03/26/GC%20and%20Tuning_1/%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3.png">
   
     <link rel="alternative" href="/atom.xml" title="冬生草的学习之旅" type="application/atom+xml">
   
@@ -185,233 +191,698 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-GC and Tuning_1" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h1 id="GC和GC-Tuning"><a href="#GC和GC-Tuning" class="headerlink" title="GC和GC Tuning"></a>GC和GC Tuning</h1><p>作者：马士兵教育 <a href="http://mashibing.com" target="_blank" rel="noopener">http://mashibing.com</a></p>
+<h3 id="GC的基础知识"><a href="#GC的基础知识" class="headerlink" title="GC的基础知识"></a>GC的基础知识</h3><h4 id="1-什么是垃圾"><a href="#1-什么是垃圾" class="headerlink" title="1.什么是垃圾"></a>1.什么是垃圾</h4><blockquote>
+<p>C语言申请内存：malloc free</p>
+<p>C++： new delete</p>
+<p>c/C++ 手动回收内存</p>
+<p>Java: new ？</p>
+<p>自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：</p>
+<ol>
+<li>忘记回收</li>
+<li>多次回收</li>
+</ol>
+</blockquote>
+<p>没有任何引用指向的一个对象或者多个对象（循环引用）</p>
+<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4><ol>
+<li>引用计数（ReferenceCount）</li>
+<li>根可达算法(RootSearching)</li>
+</ol>
+<h4 id="3-常见的垃圾回收算法"><a href="#3-常见的垃圾回收算法" class="headerlink" title="3.常见的垃圾回收算法"></a>3.常见的垃圾回收算法</h4><ol>
+<li>标记清除(mark sweep) - 位置不连续 产生碎片 效率偏低（两遍扫描）</li>
+<li>拷贝算法 (copying) - 没有碎片，浪费空间</li>
+<li>标记压缩(mark compact) - 没有碎片，效率偏低（两遍扫描，指针需要调整）</li>
+</ol>
+<h4 id="4-JVM内存分代模型（用于分代垃圾回收算法）"><a href="#4-JVM内存分代模型（用于分代垃圾回收算法）" class="headerlink" title="4.JVM内存分代模型（用于分代垃圾回收算法）"></a>4.JVM内存分代模型（用于分代垃圾回收算法）</h4><ol>
+<li><p>部分垃圾回收器使用的模型</p>
+<blockquote>
+<p>除Epsilon ZGC Shenandoah之外的GC都是使用逻辑分代模型</p>
+<p>G1是逻辑分代，物理不分代</p>
+<p>除此之外不仅逻辑分代，而且物理分代</p>
+</blockquote>
+</li>
+<li><p>新生代 + 老年代 + 永久代（1.7）Perm Generation/ 元数据区(1.8) Metaspace</p>
+<ol>
+<li>永久代 元数据 - Class</li>
+<li>永久代必须指定大小限制 ，元数据可以设置，也可以不设置，无上限（受限于物理内存）</li>
+<li>字符串常量 1.7 - 永久代，1.8 - 堆</li>
+<li>MethodArea逻辑概念 - 永久代、元数据</li>
+</ol>
+</li>
+<li><p>新生代 = Eden + 2个suvivor区 </p>
+<ol>
+<li>YGC回收之后，大多数的对象会被回收，活着的进入s0</li>
+<li>再次YGC，活着的对象eden + s0 -&gt; s1</li>
+<li>再次YGC，eden + s1 -&gt; s0</li>
+<li>年龄足够 -&gt; 老年代 （15 CMS 6）</li>
+<li>s区装不下 -&gt; 老年代</li>
+</ol>
+</li>
+<li><p>老年代</p>
+<ol>
+<li>顽固分子</li>
+<li>老年代满了FGC Full GC</li>
+</ol>
+</li>
+<li><p>GC Tuning (Generation)</p>
+<ol>
+<li>尽量减少FGC</li>
+<li>MinorGC = YGC</li>
+<li>MajorGC = FGC</li>
+</ol>
+</li>
+<li><p>对象分配过程图<br><img src="%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3.png" alt></p>
+</li>
+<li><p>动态年龄：（不重要）<br><a href="https://www.jianshu.com/p/989d3b06a49d" target="_blank" rel="noopener">https://www.jianshu.com/p/989d3b06a49d</a></p>
+</li>
+<li><p>分配担保：（不重要）<br>YGC期间 survivor区空间不够了 空间担保直接进入老年代<br>参考：<a href="https://cloud.tencent.com/developer/article/1082730" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1082730</a></p>
+</li>
+</ol>
+<h4 id="5-常见的垃圾回收器"><a href="#5-常见的垃圾回收器" class="headerlink" title="5.常见的垃圾回收器"></a>5.常见的垃圾回收器</h4><p><img src="%E5%B8%B8%E7%94%A8%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8.png" alt="常用垃圾回收器"></p>
+<ol>
+<li>垃圾回收器的发展路线，是随着内存越来越大的过程而演进<br>从分代算法演化到不分代算法<br>Serial算法 几十兆<br>Parallel算法 几个G<br>CMS 几十个G  - 承上启下，开始并发回收 -<br>.- 三色标记 - </li>
+<li>JDK诞生 Serial追随 提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前任何一个JDK版本默认是CMS<br>并发垃圾回收是因为无法忍受STW</li>
+<li>Serial 年轻代 串行回收</li>
+<li>PS 年轻代 并行回收</li>
+<li>ParNew 年轻代 配合CMS的并行回收</li>
+<li>SerialOld </li>
+<li>ParallelOld</li>
+<li>ConcurrentMarkSweep 老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms)<br>CMS问题比较多，所以现在没有一个版本默认是CMS，只能手工指定<br>CMS既然是MarkSweep，就一定会有碎片化的问题，碎片到达一定程度，CMS的老年代分配对象分配不下的时候，使用SerialOld 进行老年代回收<br>想象一下：<br>PS + PO -&gt; 加内存 换垃圾回收器 -&gt; PN + CMS + SerialOld（几个小时 - 几天的STW）<br>几十个G的内存，单线程回收 -&gt; G1 + FGC 几十个G -&gt; 上T内存的服务器 ZGC<br>算法：三色标记 + Incremental Update</li>
+<li>G1(200ms - 10ms)<br>算法：三色标记 + SATB</li>
+<li>ZGC (10ms - 1ms) PK C++<br>算法：ColoredPointers + LoadBarrier</li>
+<li>Shenandoah<br>算法：ColoredPointers + WriteBarrier</li>
+<li>Eplison</li>
+<li>PS 和 PN区别的延伸阅读：<br>▪<a href="https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html" target="_blank" rel="noopener">https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html#GUID-3D0BB91E-9BFF-4EBB-B523-14493A860E73</a></li>
+<li>垃圾收集器跟内存大小的关系<ol>
+<li>Serial 几十兆</li>
+<li>PS 上百兆 - 几个G</li>
+<li>CMS - 20G</li>
+<li>G1 - 上百G</li>
+<li>ZGC - 4T - 16T（JDK13）</li>
+</ol>
+</li>
+</ol>
+<p>1.8默认的垃圾回收：PS + ParallelOld</p>
+<h3 id="常见垃圾回收器组合参数设定：-1-8"><a href="#常见垃圾回收器组合参数设定：-1-8" class="headerlink" title="常见垃圾回收器组合参数设定：(1.8)"></a>常见垃圾回收器组合参数设定：(1.8)</h3><ul>
+<li><p>-XX:+UseSerialGC = Serial New (DefNew) + Serial Old</p>
+<ul>
+<li>小型程序。默认情况下不会是这种选项，HotSpot会根据计算及配置和JDK版本自动选择收集器</li>
+</ul>
+</li>
+<li><p>-XX:+UseParNewGC = ParNew + SerialOld</p>
+<ul>
+<li>这个组合已经很少用（在某些版本中已经废弃）</li>
+<li><a href="https://stackoverflow.com/questions/34962257/why-remove-support-for-parnewserialold-anddefnewcms-in-the-future" target="_blank" rel="noopener">https://stackoverflow.com/questions/34962257/why-remove-support-for-parnewserialold-anddefnewcms-in-the-future</a></li>
+</ul>
+</li>
+<li><p>-XX:+UseConc<font color="red">(urrent)</font>MarkSweepGC = ParNew + CMS + Serial Old</p>
+</li>
+<li><p>-XX:+UseParallelGC = Parallel Scavenge + Parallel Old (1.8默认) 【PS + SerialOld】</p>
+</li>
+<li><p>-XX:+UseParallelOldGC = Parallel Scavenge + Parallel Old</p>
+</li>
+<li><p>-XX:+UseG1GC = G1</p>
+</li>
+<li><p>Linux中没找到默认GC的查看方法，而windows中会打印UseParallelGC </p>
+<ul>
+<li>java +XX:+PrintCommandLineFlags -version</li>
+<li>通过GC的日志来分辨</li>
+</ul>
+</li>
+<li><p>Linux下1.8版本默认的垃圾回收器到底是什么？</p>
+<ul>
+<li>1.8.0_181 默认（看不出来）Copy MarkCompact</li>
+<li>1.8.0_222 默认 PS + PO</li>
+</ul>
+</li>
+</ul>
+<h3 id="JVM调优第一步，了解JVM常用命令行参数"><a href="#JVM调优第一步，了解JVM常用命令行参数" class="headerlink" title="JVM调优第一步，了解JVM常用命令行参数"></a>JVM调优第一步，了解JVM常用命令行参数</h3><ul>
+<li><p>JVM的命令行参数参考：<a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></p>
+</li>
+<li><p>HotSpot参数分类</p>
+<blockquote>
+<p>标准： - 开头，所有的HotSpot都支持</p>
+<p>非标准：-X 开头，特定版本HotSpot支持特定命令</p>
+<p>不稳定：-XX 开头，下个版本可能取消</p>
+</blockquote>
+<p>java -version</p>
+<p>java -X</p>
+</li>
+</ul>
+<p>  java -XX:+PrintFlagsWithComments //只有debug版本能用</p>
+<p>  试验用程序：</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">import</span> java.util.List;</span><br><span class="line">  <span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloGC</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">"HelloGC!"</span>);</span><br><span class="line">      List list = <span class="keyword">new</span> LinkedList();</span><br><span class="line">      <span class="keyword">for</span>(;;) &#123;</span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>*<span class="number">1024</span>];</span><br><span class="line">        list.add(b);</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+<ol>
+<li>区分概念：内存泄漏memory leak，内存溢出out of memory</li>
+<li>java -XX:+PrintCommandLineFlags HelloGC</li>
+<li>java -Xmn10M -Xms40M -Xmx60M -XX:+PrintCommandLineFlags -XX:+PrintGC  HelloGC<br>PrintGCDetails PrintGCTimeStamps PrintGCCauses</li>
+<li>java -XX:+UseConcMarkSweepGC -XX:+PrintCommandLineFlags HelloGC</li>
+<li>java -XX:+PrintFlagsInitial 默认参数值</li>
+<li>java -XX:+PrintFlagsFinal 最终参数值</li>
+<li>java -XX:+PrintFlagsFinal | grep xxx 找到对应的参数</li>
+<li>java -XX:+PrintFlagsFinal -version |grep GC</li>
+<li>java -XX:+PrintFlagsFinal -version | wc -l<br>共728个参数</li>
+</ol>
+<h3 id="PS-GC日志详解"><a href="#PS-GC日志详解" class="headerlink" title="PS GC日志详解"></a>PS GC日志详解</h3><p>每种垃圾回收器的日志格式是不同的！</p>
+<p>PS日志格式</p>
+<p><img src="./GC%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3.png" alt="GC日志详解"></p>
+<p>heap dump部分：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eden space <span class="number">5632</span>K, <span class="number">94</span>% used [<span class="number">0x00000000ff980000</span>,<span class="number">0x00000000ffeb3e28</span>,<span class="number">0x00000000fff00000</span>)</span><br><span class="line">                            后面的内存地址指的是，起始地址，使用空间结束地址，整体空间结束地址</span><br></pre></td></tr></table></figure>
+
+<p><img src="GCHeapDump.png" alt="GCHeapDump"></p>
+<p>total = eden + 1个survivor</p>
+<h3 id="调优前的基础概念："><a href="#调优前的基础概念：" class="headerlink" title="调优前的基础概念："></a>调优前的基础概念：</h3><ol>
+<li>吞吐量：用户代码时间 /（用户代码执行时间 + 垃圾回收时间）</li>
+<li>响应时间：STW越短，响应时间越好</li>
+</ol>
+<p>所谓调优，首先确定，追求啥？吞吐量优先，还是响应时间优先？还是在满足一定的响应时间的情况下，要求达到多大的吞吐量…</p>
+<p>问题：</p>
+<p>科学计算，吞吐量。数据挖掘，thrput。吞吐量优先的一般：（PS + PO）</p>
+<p>响应时间：网站 GUI API （1.8 G1）</p>
+<h3 id="什么是调优？"><a href="#什么是调优？" class="headerlink" title="什么是调优？"></a>什么是调优？</h3><ol>
+<li>根据需求进行JVM规划和预调优</li>
+<li>优化运行JVM运行环境（慢，卡顿）</li>
+<li>解决JVM运行过程中出现的各种问题(OOM)</li>
+</ol>
+<h3 id="调优，从规划开始"><a href="#调优，从规划开始" class="headerlink" title="调优，从规划开始"></a>调优，从规划开始</h3><ul>
+<li><p>调优，从业务场景开始，没有业务场景的调优都是耍流氓</p>
+</li>
+<li><p>无监控（压力测试，能看到结果），不调优</p>
+</li>
+<li><p>步骤：</p>
+<ol>
+<li>熟悉业务场景（没有最好的垃圾回收器，只有最合适的垃圾回收器）<ol>
+<li>响应时间、停顿时间 [CMS G1 ZGC] （需要给用户作响应）</li>
+<li>吞吐量 = 用户时间 /( 用户时间 + GC时间) [PS]</li>
+</ol>
+</li>
+<li>选择回收器组合</li>
+<li>计算内存需求（经验值 1.5G 16G）</li>
+<li>选定CPU（越高越好）</li>
+<li>设定年代大小、升级年龄</li>
+<li>设定日志参数<ol>
+<li>-Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=20M -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause</li>
+<li>或者每天产生一个日志文件</li>
+</ol>
+</li>
+<li>观察日志情况</li>
+</ol>
+</li>
+<li><p>案例1：垂直电商，最高每日百万订单，处理订单系统需要什么样的服务器配置？</p>
+<blockquote>
+<p>这个问题比较业余，因为很多不同的服务器配置都能支撑(1.5G 16G)</p>
+<p>1小时360000集中时间段， 100个订单/秒，（找一小时内的高峰期，1000订单/秒）</p>
+<p>经验值，</p>
+<p>非要计算：一个订单产生需要多少内存？512K * 1000 500M内存</p>
+<p>专业一点儿问法：要求响应时间100ms</p>
+<p>压测！</p>
+</blockquote>
+</li>
+<li><p>案例2：12306遭遇春节大规模抢票应该如何支撑？</p>
+<blockquote>
+<p>12306应该是中国并发量最大的秒杀网站：</p>
+<p>号称并发量100W最高</p>
+<p>CDN -&gt; LVS -&gt; NGINX -&gt; 业务系统 -&gt; 每台机器1W并发（10K问题） 100台机器</p>
+<p>普通电商订单 -&gt; 下单 -&gt;订单系统（IO）减库存 -&gt;等待用户付款</p>
+<p>12306的一种可能的模型： 下单 -&gt; 减库存 和 订单(redis kafka) 同时异步进行 -&gt;等付款</p>
+<p>减库存最后还会把压力压到一台服务器</p>
+<p>可以做分布式本地库存 + 单独服务器做库存均衡</p>
+<p>大流量的处理方法：分而治之</p>
+</blockquote>
+</li>
+<li><p>怎么得到一个事务会消耗多少内存？</p>
+<blockquote>
+<ol>
+<li><p>弄台机器，看能承受多少TPS？是不是达到目标？扩容或调优，让它达到</p>
+</li>
+<li><p>用压测来确定</p>
+</li>
+</ol>
+</blockquote>
+</li>
+</ul>
+<h3 id="优化环境"><a href="#优化环境" class="headerlink" title="优化环境"></a>优化环境</h3><ol>
+<li>有一个50万PV的资料类网站（从磁盘提取文档到内存）原服务器32位，1.5G<br>的堆，用户反馈网站比较缓慢，因此公司决定升级，新的服务器为64位，16G<br>的堆内存，结果用户反馈卡顿十分严重，反而比以前效率更低了<ol>
+<li>为什么原网站慢?<br>很多用户浏览数据，很多数据load到内存，内存不足，频繁GC，STW长，响应时间变慢</li>
+<li>为什么会更卡顿？<br>内存越大，FGC时间越长</li>
+<li>咋办？<br>PS -&gt; PN + CMS 或者 G1</li>
+</ol>
+</li>
+<li>系统CPU经常100%，如何调优？(面试高频)<br>CPU100%那么一定有线程在占用系统资源，<ol>
+<li>找出哪个进程cpu高（top）</li>
+<li>该进程中的哪个线程cpu高（top -Hp）</li>
+<li>导出该线程的堆栈 (jstack)</li>
+<li>查找哪个方法（栈帧）消耗时间 (jstack)</li>
+<li>工作线程占比高 | 垃圾回收线程占比高</li>
+</ol>
+</li>
+<li>系统内存飙高，如何查找问题？（面试高频）<ol>
+<li>导出堆内存 (jmap)</li>
+<li>分析 (jhat jvisualvm mat jprofiler … )</li>
+</ol>
+</li>
+<li>如何监控JVM<ol>
+<li>jstat jvisualvm jprofiler arthas top…</li>
+</ol>
+</li>
+</ol>
+<h3 id="解决JVM运行中的问题"><a href="#解决JVM运行中的问题" class="headerlink" title="解决JVM运行中的问题"></a>解决JVM运行中的问题</h3><h4 id="一个案例理解常用工具"><a href="#一个案例理解常用工具" class="headerlink" title="一个案例理解常用工具"></a>一个案例理解常用工具</h4><ol>
+<li><p>测试代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mashibing.jvm.gc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.math.BigDecimal;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ScheduledThreadPoolExecutor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ThreadPoolExecutor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 从数据库中读取信用数据，套用模型，并把结果进行记录和传输</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">T15_FullGC_Problem01</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CardInfo</span> </span>&#123;</span><br><span class="line">        BigDecimal price = <span class="keyword">new</span> BigDecimal(<span class="number">0.0</span>);</span><br><span class="line">        String name = <span class="string">"张三"</span>;</span><br><span class="line">        <span class="keyword">int</span> age = <span class="number">5</span>;</span><br><span class="line">        Date birthdate = <span class="keyword">new</span> Date();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">m</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ScheduledThreadPoolExecutor executor = <span class="keyword">new</span> ScheduledThreadPoolExecutor(<span class="number">50</span>,</span><br><span class="line">            <span class="keyword">new</span> ThreadPoolExecutor.DiscardOldestPolicy());</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        executor.setMaximumPoolSize(<span class="number">50</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (;;)&#123;</span><br><span class="line">            modelFit();</span><br><span class="line">            Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">modelFit</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;CardInfo&gt; taskList = getAllCardInfo();</span><br><span class="line">        taskList.forEach(info -&gt; &#123;</span><br><span class="line">            <span class="comment">// do something</span></span><br><span class="line">            executor.scheduleWithFixedDelay(() -&gt; &#123;</span><br><span class="line">                <span class="comment">//do sth with info</span></span><br><span class="line">                info.m();</span><br><span class="line"></span><br><span class="line">            &#125;, <span class="number">2</span>, <span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> List&lt;CardInfo&gt; <span class="title">getAllCardInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;CardInfo&gt; taskList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            CardInfo ci = <span class="keyword">new</span> CardInfo();</span><br><span class="line">            taskList.add(ci);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> taskList;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>java -Xms200M -Xmx200M -XX:+PrintGC com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
+</li>
+<li><p>一般是运维团队首先受到报警信息（CPU Memory）</p>
+</li>
+<li><p>top命令观察到问题：内存不断增长 CPU占用率居高不下</p>
+</li>
+<li><p>top -Hp 观察进程中的线程，哪个线程CPU和内存占比高</p>
+</li>
+<li><p>jps定位具体java进程<br>jstack 定位线程状况，重点关注：WAITING BLOCKED<br>eg.<br>waiting on &lt;0x0000000088ca3310&gt; (a java.lang.Object)<br>假如有一个进程中100个线程，很多线程都在waiting on <xx> ，一定要找到是哪个线程持有这把锁<br>怎么找？搜索jstack dump的信息，找<xx> ，看哪个线程持有这把锁RUNNABLE<br>作业：1：写一个死锁程序，用jstack观察 2 ：写一个程序，一个线程持有锁不释放，其他线程等待</xx></xx></p>
+</li>
+<li><p>为什么阿里规范里规定，线程的名称（尤其是线程池）都要写有意义的名称<br>怎么样自定义线程池里的线程名称？（自定义ThreadFactory）</p>
+</li>
+<li><p>jinfo pid </p>
+</li>
+<li><p>jstat -gc 动态观察gc情况 / 阅读GC日志发现频繁GC / arthas观察 / jconsole/jvisualVM/ Jprofiler（最好用）<br>jstat -gc 4655 500 : 每个500个毫秒打印GC的情况<br>如果面试官问你是怎么定位OOM问题的？如果你回答用图形界面（错误）<br>1：已经上线的系统不用图形界面用什么？（cmdline arthas）<br>2：图形界面到底用在什么地方？测试！测试的时候进行监控！（压测观察）</p>
+</li>
+<li><p>jmap - histo 4655 | head -20，查找有多少对象产生</p>
+</li>
+<li><p>jmap -dump:format=b,file=xxx pid ：</p>
+<p>线上系统，内存特别大，jmap执行期间会对进程产生很大影响，甚至卡顿（电商不适合）<br>1：设定了参数HeapDump，OOM的时候会自动产生堆转储文件（不是很专业，因为多有监控，内存增长就会报警）<br>2：<font color="red">很多服务器备份（高可用），停掉这台服务器对其他服务器不影响</font><br>3：在线定位(一般小点儿公司用不到)</p>
+<p>4：在测试环境中压测（产生类似内存增长问题，在堆还不是很大的时候进行转储）</p>
+</li>
+<li><p>java -Xms20M -Xmx20M -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
+</li>
+<li><p>使用MAT / jhat /jvisualvm 进行dump文件分析<br> <a href="https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html" target="_blank" rel="noopener">https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html</a><br>jhat -J-mx512M xxx.dump<br><a href="http://192.168.17.11:7000" target="_blank" rel="noopener">http://192.168.17.11:7000</a><br>拉到最后：找到对应链接<br>可以使用OQL查找特定问题对象</p>
+</li>
+<li><p>找到代码的问题</p>
+</li>
+</ol>
+<h4 id="jconsole远程连接"><a href="#jconsole远程连接" class="headerlink" title="jconsole远程连接"></a>jconsole远程连接</h4><ol>
+<li><p>程序启动加入参数：</p>
+<blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> java -Djava.rmi.server.hostname=192.168.17.11 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=11111 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false XXX</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>如果遭遇 Local host name unknown：XXX的错误，修改/etc/hosts文件，把XXX加入进去</p>
+<blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="number">192.168</span><span class="number">.17</span><span class="number">.11</span> basic localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">&gt; ::<span class="number">1</span>         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>关闭linux防火墙（实战中应该打开对应端口）</p>
+<blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> service iptables stop</span><br><span class="line"><span class="meta">&gt;</span> chkconfig iptables off #永久关闭</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
+</blockquote>
+</li>
+<li><p>windows上打开 jconsole远程连接 192.168.17.11:11111</p>
+</li>
+</ol>
+<h4 id="jvisualvm远程连接"><a href="#jvisualvm远程连接" class="headerlink" title="jvisualvm远程连接"></a>jvisualvm远程连接</h4><p> <a href="https://www.cnblogs.com/liugh/p/7620336.html" target="_blank" rel="noopener">https://www.cnblogs.com/liugh/p/7620336.html</a> （简单做法）</p>
+<h4 id="jprofiler-收费"><a href="#jprofiler-收费" class="headerlink" title="jprofiler (收费)"></a>jprofiler (收费)</h4><h4 id="arthas在线排查工具"><a href="#arthas在线排查工具" class="headerlink" title="arthas在线排查工具"></a>arthas在线排查工具</h4><ul>
+<li>为什么需要在线排查？<br> 在生产上我们经常会碰到一些不好排查的问题，例如线程安全问题，用最简单的threaddump或者heapdump不好查到问题原因。为了排查这些问题，有时我们会临时加一些日志，比如在一些关键的函数里打印出入参，然后重新打包发布，如果打了日志还是没找到问题，继续加日志，重新打包发布。对于上线流程复杂而且审核比较严的公司，从改代码到上线需要层层的流转，会大大影响问题排查的进度。 </li>
+<li>jvm观察jvm信息</li>
+<li>thread定位线程问题</li>
+<li>dashboard 观察系统情况</li>
+<li>heapdump + jhat分析</li>
+<li>jad反编译<br> 动态代理生成类的问题定位<br> 第三方的类（观察代码）<br> 版本问题（确定自己最新提交的版本是不是被使用）</li>
+<li>redefine 热替换<br> 目前有些限制条件：只能改方法实现（方法已经运行完成），不能改方法名， 不能改属性<br> m() -&gt; mm()</li>
+<li>sc  - search class</li>
+<li>watch  - watch method</li>
+<li>没有包含的功能：jmap</li>
+</ul>
+<h3 id="GC算法的基础概念"><a href="#GC算法的基础概念" class="headerlink" title="GC算法的基础概念"></a>GC算法的基础概念</h3><ul>
+<li>Card Table<br>由于做YGC时，需要扫描整个OLD区，效率非常低，所以JVM设计了CardTable， 如果一个OLD区CardTable中有对象指向Y区，就将它设为Dirty，下次扫描时，只需要扫描Dirty Card<br>在结构上，Card Table用BitMap来实现</li>
+</ul>
+<h3 id="CMS"><a href="#CMS" class="headerlink" title="CMS"></a>CMS</h3><h4 id="CMS的问题"><a href="#CMS的问题" class="headerlink" title="CMS的问题"></a>CMS的问题</h4><ol>
+<li><p>Memory Fragmentation</p>
+<blockquote>
+<p>-XX:+UseCMSCompactAtFullCollection<br>-XX:CMSFullGCsBeforeCompaction 默认为0 指的是经过多少次FGC才进行压缩</p>
+</blockquote>
+</li>
+<li><p>Floating Garbage</p>
+<blockquote>
+<p>Concurrent Mode Failure<br>产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stopped</p>
+<p>解决方案：降低触发CMS的阈值</p>
+<p>PromotionFailed</p>
+<p>解决方案类似，保持老年代有足够的空间</p>
+<p>–XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="CMS日志分析"><a href="#CMS日志分析" class="headerlink" title="CMS日志分析"></a>CMS日志分析</h4><p>执行命令：java -Xms20M -Xmx20M -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
+<p>[GC (Allocation Failure) [ParNew: 6144K-&gt;640K(6144K), 0.0265885 secs] 6585K-&gt;2770K(19840K), 0.0268035 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] </p>
+<blockquote>
+<p>ParNew：年轻代收集器</p>
+<p>6144-&gt;640：收集前后的对比</p>
+<p>（6144）：整个年轻代容量</p>
+<p>6585 -&gt; 2770：整个堆的情况</p>
+<p>（19840）：整个堆大小</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[GC (CMS Initial Mark) [<span class="number">1</span> CMS-initial-mark: <span class="number">8511</span>K(<span class="number">13696</span>K)] <span class="number">9866</span>K(<span class="number">19840</span>K), <span class="number">0.0040321</span> secs] [Times: user=<span class="number">0.01</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">	<span class="comment">//8511 (13696) : 老年代使用（最大）</span></span><br><span class="line">	<span class="comment">//9866 (19840) : 整个堆使用（最大）</span></span><br><span class="line">[CMS-concurrent-mark-start]</span><br><span class="line">[CMS-concurrent-mark: <span class="number">0.018</span>/<span class="number">0.018</span> secs] [Times: user=<span class="number">0.01</span> sys=<span class="number">0.00</span>, real=<span class="number">0.02</span> secs] </span><br><span class="line">	<span class="comment">//这里的时间意义不大，因为是并发执行</span></span><br><span class="line">[CMS-concurrent-preclean-start]</span><br><span class="line">[CMS-concurrent-preclean: <span class="number">0.000</span>/<span class="number">0.000</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">	<span class="comment">//标记Card为Dirty，也称为Card Marking</span></span><br><span class="line">[GC (CMS Final Remark) [YG occupancy: 1597 K (6144 K)][Rescan (parallel) , 0.0008396 secs][weak refs processing, 0.0000138 secs][class unloading, 0.0005404 secs][scrub symbol table, 0.0006169 secs][scrub string table, 0.0004903 secs][1 CMS-remark: 8511K(13696K)] 10108K(19840K), 0.0039567 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">	<span class="comment">//STW阶段，YG occupancy:年轻代占用及容量</span></span><br><span class="line">	<span class="comment">//[Rescan (parallel)：STW下的存活对象标记</span></span><br><span class="line">	<span class="comment">//weak refs processing: 弱引用处理</span></span><br><span class="line">	<span class="comment">//class unloading: 卸载用不到的class</span></span><br><span class="line">	<span class="comment">//scrub symbol(string) table: </span></span><br><span class="line">		<span class="comment">//cleaning up symbol and string tables which hold class-level metadata and </span></span><br><span class="line">		<span class="comment">//internalized string respectively</span></span><br><span class="line">	<span class="comment">//CMS-remark: 8511K(13696K): 阶段过后的老年代占用及容量</span></span><br><span class="line">	<span class="comment">//10108K(19840K): 阶段过后的堆占用及容量</span></span><br><span class="line"></span><br><span class="line">[CMS-concurrent-sweep-start]</span><br><span class="line">[CMS-concurrent-sweep: <span class="number">0.005</span>/<span class="number">0.005</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">	<span class="comment">//标记已经完成，进行并发清理</span></span><br><span class="line">[CMS-concurrent-reset-start]</span><br><span class="line">[CMS-concurrent-reset: <span class="number">0.000</span>/<span class="number">0.000</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs]</span><br><span class="line">	<span class="comment">//重置内部结构，为下次GC做准备</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="G1"><a href="#G1" class="headerlink" title="G1"></a>G1</h3><ol>
+<li>▪<a href="https://www.oracle.com/technical-resources/articles/java/g1gc.html" target="_blank" rel="noopener">https://www.oracle.com/technical-resources/articles/java/g1gc.html</a></li>
+</ol>
+<h4 id="G1日志详解"><a href="#G1日志详解" class="headerlink" title="G1日志详解"></a>G1日志详解</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[<span class="function">GC <span class="title">pause</span> <span class="params">(G1 Evacuation Pause)</span> <span class="params">(young)</span> <span class="params">(initial-mark)</span>, 0.0015790 secs]</span></span><br><span class="line"><span class="function"><span class="comment">//young -&gt; 年轻代 Evacuation-&gt; 复制存活对象 </span></span></span><br><span class="line"><span class="function"><span class="comment">//initial-mark 混合回收的阶段，这里是YGC混合老年代回收</span></span></span><br><span class="line"><span class="function">   [Parallel Time: 1.5 ms, GC Workers: 1] <span class="comment">//一个GC线程</span></span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Start</span> <span class="params">(ms)</span>:  92635.7]</span></span><br><span class="line"><span class="function">      [Ext Root <span class="title">Scanning</span> <span class="params">(ms)</span>:  1.1]</span></span><br><span class="line"><span class="function">      [Update <span class="title">RS</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">         [Processed Buffers:  1]</span></span><br><span class="line"><span class="function">      [Scan <span class="title">RS</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [Code Root <span class="title">Scanning</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [Object <span class="title">Copy</span> <span class="params">(ms)</span>:  0.1]</span></span><br><span class="line"><span class="function">      [<span class="title">Termination</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">         [Termination Attempts:  1]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Other</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Total</span> <span class="params">(ms)</span>:  1.2]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">End</span> <span class="params">(ms)</span>:  92636.9]</span></span><br><span class="line"><span class="function">   [Code Root Fixup: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Code Root Purge: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Clear CT: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Other: 0.1 ms]</span></span><br><span class="line"><span class="function">      [Choose CSet: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Ref Proc: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Ref Enq: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Redirty Cards: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Humongous Register: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Humongous Reclaim: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Free CSet: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Eden: 0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span>-&gt;0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span> Survivors: 0.0B-&gt;0.0B Heap: 18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>-&gt;18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>]</span></span><br><span class="line"><span class="function"> [Times: user</span>=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line"><span class="comment">//以下是混合回收其他阶段</span></span><br><span class="line">[GC concurrent-root-region-scan-start]</span><br><span class="line">[GC concurrent-root-region-scan-end, <span class="number">0.0000078</span> secs]</span><br><span class="line">[GC concurrent-mark-start]</span><br><span class="line"><span class="comment">//无法evacuation，进行FGC</span></span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Allocation Failure)</span>  18M-&gt;18<span class="title">M</span><span class="params">(<span class="number">20</span>M)</span>, 0.0719656 secs]</span></span><br><span class="line"><span class="function">   [Eden: 0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span>-&gt;0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span> Survivors: 0.0B-&gt;0.0B Heap: 18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>-&gt;18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>], [Metaspace: 38</span></span><br><span class="line"><span class="function">76K-&gt;3876<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>] [Times: user</span>=<span class="number">0.07</span> sys=<span class="number">0.00</span>, real=<span class="number">0.07</span> secs]</span><br></pre></td></tr></table></figure>
+
+<h3 id="案例汇总"><a href="#案例汇总" class="headerlink" title="案例汇总"></a>案例汇总</h3><p>OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙高，但内存回收特别少) （上面案例）</p>
+<ol>
+<li><p>硬件升级系统反而卡顿的问题（见上）</p>
+</li>
+<li><p>线程池不当运用产生OOM问题（见上）<br>不断的往List里加对象（实在太LOW）</p>
+</li>
+<li><p>smile jira问题<br>实际系统不断重启<br>解决问题 加内存 + 更换垃圾回收器 G1<br>真正问题在哪儿？不知道</p>
+</li>
+<li><p>tomcat http-header-size过大问题（Hector）</p>
+</li>
+<li><p>lambda表达式导致方法区溢出问题(MethodArea / Perm Metaspace)<br>LambdaGC.java     -XX:MaxMetaspaceSize=9M -XX:+PrintGCDetails</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"C:\Program Files\Java\jdk1.8.0_181\bin\java.exe"</span> -XX:MaxMetaspaceSize=<span class="number">9</span>M -XX:+PrintGCDetails <span class="string">"-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\lib\idea_rt.jar=49316:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\bin"</span> -Dfile.encoding=UTF-<span class="number">8</span> -classpath <span class="string">"C:\Program Files\Java\jdk1.8.0_181\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\rt.jar;C:\work\ijprojects\JVM\out\production\JVM;C:\work\ijprojects\ObjectSize\out\artifacts\ObjectSize_jar\ObjectSize.jar"</span> com.mashibing.jvm.gc.LambdaGC</span><br><span class="line">[GC (Metadata GC Threshold) [PSYoungGen: <span class="number">11341</span>K-&gt;<span class="number">1880</span>K(<span class="number">38400</span>K)] <span class="number">11341</span>K-&gt;<span class="number">1888</span>K(<span class="number">125952</span>K), <span class="number">0.0022190</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span> [PSYoungGen: 1880K-&gt;0<span class="title">K</span><span class="params">(<span class="number">38400</span>K)</span>] [ParOldGen: 8K-&gt;1777<span class="title">K</span><span class="params">(<span class="number">35328</span>K)</span>] 1888K-&gt;1777<span class="title">K</span><span class="params">(<span class="number">73728</span>K)</span>, [Metaspace: 8164K-&gt;8164<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>], 0.0100681 secs] [Times: user</span>=<span class="number">0.02</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">[GC (Last ditch collection) [PSYoungGen: <span class="number">0</span>K-&gt;<span class="number">0</span>K(<span class="number">38400</span>K)] <span class="number">1777</span>K-&gt;<span class="number">1777</span>K(<span class="number">73728</span>K), <span class="number">0.0005698</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Last ditch collection)</span> [PSYoungGen: 0K-&gt;0<span class="title">K</span><span class="params">(<span class="number">38400</span>K)</span>] [ParOldGen: 1777K-&gt;1629<span class="title">K</span><span class="params">(<span class="number">67584</span>K)</span>] 1777K-&gt;1629<span class="title">K</span><span class="params">(<span class="number">105984</span>K)</span>, [Metaspace: 8164K-&gt;8156<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>], 0.0124299 secs] [Times: user</span>=<span class="number">0.06</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">java.lang.reflect.InvocationTargetException</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:<span class="number">62</span>)</span><br><span class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="number">43</span>)</span><br><span class="line">	at java.lang.reflect.Method.invoke(Method.java:<span class="number">498</span>)</span><br><span class="line">	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:<span class="number">388</span>)</span><br><span class="line">	at sun.instrument.InstrumentationImpl.loadClassAndCallAgentmain(InstrumentationImpl.java:<span class="number">411</span>)</span><br><span class="line">Caused by: java.lang.OutOfMemoryError: Compressed <span class="class"><span class="keyword">class</span> <span class="title">space</span></span></span><br><span class="line"><span class="class">	<span class="title">at</span> <span class="title">sun</span>.<span class="title">misc</span>.<span class="title">Unsafe</span>.<span class="title">defineClass</span>(<span class="title">Native</span> <span class="title">Method</span>)</span></span><br><span class="line">	at sun.reflect.ClassDefiner.defineClass(ClassDefiner.java:63)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator$<span class="number">1</span>.run(MethodAccessorGenerator.java:<span class="number">399</span>)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator$<span class="number">1</span>.run(MethodAccessorGenerator.java:<span class="number">394</span>)</span><br><span class="line">	at java.security.AccessController.doPrivileged(Native Method)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator.generate(MethodAccessorGenerator.java:<span class="number">393</span>)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator.generateSerializationConstructor(MethodAccessorGenerator.java:<span class="number">112</span>)</span><br><span class="line">	at sun.reflect.ReflectionFactory.generateConstructor(ReflectionFactory.java:<span class="number">398</span>)</span><br><span class="line">	at sun.reflect.ReflectionFactory.newConstructorForSerialization(ReflectionFactory.java:<span class="number">360</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.getSerializableConstructor(ObjectStreamClass.java:<span class="number">1574</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.access$<span class="number">1500</span>(ObjectStreamClass.java:<span class="number">79</span>)</span><br><span class="line">	at java.io.ObjectStreamClass$<span class="number">3</span>.run(ObjectStreamClass.java:<span class="number">519</span>)</span><br><span class="line">	at java.io.ObjectStreamClass$<span class="number">3</span>.run(ObjectStreamClass.java:<span class="number">494</span>)</span><br><span class="line">	at java.security.AccessController.doPrivileged(Native Method)</span><br><span class="line">	at java.io.ObjectStreamClass.&lt;init&gt;(ObjectStreamClass.java:<span class="number">494</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.lookup(ObjectStreamClass.java:<span class="number">391</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="number">1134</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.defaultWriteFields(ObjectOutputStream.java:<span class="number">1548</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeSerialData(ObjectOutputStream.java:<span class="number">1509</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeOrdinaryObject(ObjectOutputStream.java:<span class="number">1432</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="number">1178</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:<span class="number">348</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeJRMPStub(RMIConnectorServer.java:<span class="number">727</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeStub(RMIConnectorServer.java:<span class="number">719</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeStubInAddress(RMIConnectorServer.java:<span class="number">690</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.start(RMIConnectorServer.java:<span class="number">439</span>)</span><br><span class="line">	at sun.management.jmxremote.ConnectorBootstrap.startLocalConnectorServer(ConnectorBootstrap.java:<span class="number">550</span>)</span><br><span class="line">	at sun.management.Agent.startLocalManagementAgent(Agent.java:<span class="number">137</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>直接内存溢出问题（少见）<br>《深入理解Java虚拟机》P59，使用Unsafe分配直接内存，或者使用NIO的问题</p>
+</li>
+<li><p>栈溢出问题<br>-Xss设定太小</p>
+</li>
+<li><p>比较一下这两段程序的异同，分析哪一个是更优的写法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Object o = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100</span>; i++) &#123;</span><br><span class="line">    o = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="comment">//业务处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100</span>; i++) &#123;</span><br><span class="line">    Object o = <span class="keyword">new</span> Object();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>重写finalize引发频繁GC<br>小米云，HBase同步系统，系统通过nginx访问超时报警，最后排查，C++程序员重写finalize引发频繁GC问题<br>为什么C++程序员会重写finalize？（new delete）<br>finalize耗时比较长（200ms）</p>
+</li>
+<li><p>如果有一个系统，内存一直消耗不超过10%，但是观察GC日志，发现FGC总是频繁产生，会是什么引起的？<br>System.gc() (这个比较Low)</p>
+</li>
+<li><p>Distuptor有个可以设置链的长度，如果过大，然后对象大，消费完不主动释放，会溢出 (来自 死物风情)</p>
+</li>
+<li><p>用jvm都会溢出，mycat用崩过，1.6.5某个临时版本解析sql子查询算法有问题，9个exists的联合sql就导致生成几百万的对象（来自 死物风情）</p>
+</li>
+<li><p>new 大量线程，会产生 native thread OOM，（low）应该用线程池，<br>解决方案：减少堆空间（太TMlow了）,预留更多内存产生native thread<br>JVM内存占物理内存比例 50% - 80%</p>
+</li>
+</ol>
+<h3 id="GC常用参数"><a href="#GC常用参数" class="headerlink" title="GC常用参数"></a>GC常用参数</h3><ul>
+<li>-Xmn -Xms -Xmx -Xss<br>年轻代 最小堆 最大堆 栈空间</li>
+<li>-XX:+UseTLAB<br>使用TLAB，默认打开</li>
+<li>-XX:+PrintTLAB<br>打印TLAB的使用情况</li>
+<li>-XX:TLABSize<br>设置TLAB大小</li>
+<li>-XX:+DisableExplictGC<br>System.gc()不管用 ，FGC</li>
+<li>-XX:+PrintGC</li>
+<li>-XX:+PrintGCDetails</li>
+<li>-XX:+PrintHeapAtGC</li>
+<li>-XX:+PrintGCTimeStamps</li>
+<li>-XX:+PrintGCApplicationConcurrentTime (低)<br>打印应用程序时间</li>
+<li>-XX:+PrintGCApplicationStoppedTime （低）<br>打印暂停时长</li>
+<li>-XX:+PrintReferenceGC （重要性低）<br>记录回收了多少种不同引用类型的引用</li>
+<li>-verbose:class<br>类加载详细过程</li>
+<li>-XX:+PrintVMOptions</li>
+<li>-XX:+PrintFlagsFinal  -XX:+PrintFlagsInitial<br>必须会用</li>
+<li>-Xloggc:opt/log/gc.log</li>
+<li>-XX:MaxTenuringThreshold<br>升代年龄，最大值15</li>
+<li>锁自旋次数 -XX:PreBlockSpin 热点代码检测参数-XX:CompileThreshold 逃逸分析 标量替换 …<br>这些不建议设置</li>
+</ul>
+<h3 id="Parallel常用参数"><a href="#Parallel常用参数" class="headerlink" title="Parallel常用参数"></a>Parallel常用参数</h3><ul>
+<li>-XX:SurvivorRatio</li>
+<li>-XX:PreTenureSizeThreshold<br>大对象到底多大</li>
+<li>-XX:MaxTenuringThreshold</li>
+<li>-XX:+ParallelGCThreads<br>并行收集器的线程数，同样适用于CMS，一般设为和CPU核数相同</li>
+<li>-XX:+UseAdaptiveSizePolicy<br>自动选择各区大小比例</li>
+</ul>
+<h3 id="CMS常用参数"><a href="#CMS常用参数" class="headerlink" title="CMS常用参数"></a>CMS常用参数</h3><ul>
+<li>-XX:+UseConcMarkSweepGC</li>
+<li>-XX:ParallelCMSThreads<br>CMS线程数量</li>
+<li>-XX:CMSInitiatingOccupancyFraction<br>使用多少比例的老年代后开始CMS收集，默认是68%(近似值)，如果频繁发生SerialOld卡顿，应该调小，（频繁CMS回收）</li>
+<li>-XX:+UseCMSCompactAtFullCollection<br>在FGC时进行压缩</li>
+<li>-XX:CMSFullGCsBeforeCompaction<br>多少次FGC之后进行压缩</li>
+<li>-XX:+CMSClassUnloadingEnabled</li>
+<li>-XX:CMSInitiatingPermOccupancyFraction<br>达到什么比例时进行Perm回收</li>
+<li>GCTimeRatio<br>设置GC时间占用程序运行时间的百分比</li>
+<li>-XX:MaxGCPauseMillis<br>停顿时间，是一个建议时间，GC会尝试用各种手段达到这个时间，比如减小年轻代</li>
+</ul>
+<h3 id="G1常用参数"><a href="#G1常用参数" class="headerlink" title="G1常用参数"></a>G1常用参数</h3><ul>
+<li>-XX:+UseG1GC</li>
+<li>-XX:MaxGCPauseMillis<br>建议值，G1会尝试调整Young区的块数来达到这个值</li>
+<li>-XX:GCPauseIntervalMillis<br>？GC的间隔时间</li>
+<li>-XX:+G1HeapRegionSize<br>分区大小，建议逐渐增大该值，1 2 4 8 16 32。<br>随着size增加，垃圾的存活时间更长，GC间隔更长，但每次GC的时间也会更长<br>ZGC做了改进（动态区块大小）</li>
+<li>G1NewSizePercent<br>新生代最小比例，默认为5%</li>
+<li>G1MaxNewSizePercent<br>新生代最大比例，默认为60%</li>
+<li>GCTimeRatio<br>GC时间建议比例，G1会根据这个值调整堆空间</li>
+<li>ConcGCThreads<br>线程数量</li>
+<li>InitiatingHeapOccupancyPercent<br>启动G1的堆空间占用比例</li>
+</ul>
+<h4 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h4><ol>
+<li><p>-XX:MaxTenuringThreshold控制的是什么？<br>A: 对象升入老年代的年龄</p>
+<pre><code>B: 老年代触发FGC时的内存垃圾比例</code></pre></li>
+<li><p>生产环境中，倾向于将最大堆内存和最小堆内存设置为：（为什么？）<br>A: 相同 B：不同</p>
+</li>
+<li><p>JDK1.8默认的垃圾回收器是：<br>A: ParNew + CMS</p>
+<pre><code>B: G1
+C: PS + ParallelOld
+D: 以上都不是</code></pre></li>
+<li><p>什么是响应时间优先？</p>
+</li>
+<li><p>什么是吞吐量优先？</p>
+</li>
+<li><p>ParNew和PS的区别是什么？</p>
+</li>
+<li><p>ParNew和ParallelOld的区别是什么？（年代不同，算法不同）</p>
+</li>
+<li><p>长时间计算的场景应该选择：A：停顿时间 B: 吞吐量</p>
+</li>
+<li><p>大规模电商网站应该选择：A：停顿时间 B: 吞吐量</p>
+</li>
+<li><p>HotSpot的垃圾收集器最常用有哪些？</p>
+</li>
+<li><p>常见的HotSpot垃圾收集器组合有哪些？</p>
+</li>
+<li><p>JDK1.7 1.8 1.9的默认垃圾回收器是什么？如何查看？</p>
+</li>
+<li><p>所谓调优，到底是在调什么？</p>
+</li>
+<li><p>如果采用PS + ParrallelOld组合，怎么做才能让系统基本不产生FGC</p>
+</li>
+<li><p>如果采用ParNew + CMS组合，怎样做才能够让系统基本不产生FGC</p>
+<p> 1.加大JVM内存</p>
+<p> 2.加大Young的比例</p>
+<p> 3.提高Y-O的年龄</p>
+<p> 4.提高S区比例</p>
+<p> 5.避免代码内存泄漏</p>
+</li>
+<li><p>G1是否分代？G1垃圾回收器会产生FGC吗？</p>
+</li>
+<li><p>如果G1产生FGC，你应该做什么？</p>
+<ol>
+<li>扩内存</li>
+<li>提高CPU性能（回收的快，业务逻辑产生对象的速度固定，垃圾回收越快，内存空间越大）</li>
+<li>降低MixedGC触发的阈值，让MixedGC提早发生（默认是45%）</li>
+</ol>
+<ol start="18">
+<li><p>问：生产环境中能够随随便便的dump吗？<br>小堆影响不大，大堆会有服务暂停或卡顿（加live可以缓解），dump前会有FGC</p>
+</li>
+<li><p>问：常见的OOM问题有哪些？<br>栈 堆 MethodArea 直接内存</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
+<li><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">https://blogs.oracle.com/</a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">jonthecollector</a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">/our-collectors</a></li>
+<li><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></li>
+<li><a href="http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp" target="_blank" rel="noopener">http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp</a></li>
+<li>JVM调优参考文档：<a href="https://docs.oracle.com/en/java/javase/13/gctuning/introduction-garbage-collection-tuning.html#GUID-8A443184-7E07-4B71-9777-4F12947C8184" target="_blank" rel="noopener">https://docs.oracle.com/en/java/javase/13/gctuning/introduction-garbage-collection-tuning.html#GUID-8A443184-7E07-4B71-9777-4F12947C8184</a> </li>
+<li><a href="https://www.cnblogs.com/nxlhero/p/11660854.html" target="_blank" rel="noopener">https://www.cnblogs.com/nxlhero/p/11660854.html</a> 在线排查工具</li>
+<li><a href="https://www.jianshu.com/p/507f7e0cc3a3" target="_blank" rel="noopener">https://www.jianshu.com/p/507f7e0cc3a3</a> arthas常用命令</li>
+<li>Arthas手册：<ol>
+<li>启动arthas java -jar arthas-boot.jar</li>
+<li>绑定java进程</li>
+<li>dashboard命令观察系统整体情况</li>
+<li>help 查看帮助</li>
+<li>help xx 查看具体命令帮助</li>
+</ol>
+</li>
+<li>jmap命令参考： <a href="https://www.jianshu.com/p/507f7e0cc3a3" target="_blank" rel="noopener">https://www.jianshu.com/p/507f7e0cc3a3</a> <ol>
+<li>jmap -heap pid</li>
+<li>jmap -histo pid</li>
+<li>jmap -clstats pid</li>
+</ol>
+</li>
+</ol>
+
+    
+
+    
+    <div class="page-reward">
+      <a href="javascript:void(0);" class="page-reward-btn tooltip-top" target="_self">
+        <div class="tooltip tooltip-east">
+          <span class="tooltip-item">
+            赏
+          </span>
+          <span class="tooltip-content">
+            <span class="tooltip-text">
+              <span class="tooltip-inner">
+                <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i
+                    class="icon icon-quo-right"></i></p>
+                <div class="reward-box">
+                  
+                  <div class="reward-box-item">
+                    <img class="reward-img" src="/img/alipay.png">
+                    <span class="reward-type">支付宝</span>
+                  </div>
+                  
+                  
+                  <div class="reward-box-item">
+                    <img class="reward-img" src="/img/weixin.png">
+                    <span class="reward-type">微信</span>
+                  </div>
+                  
+                </div>
+              </span>
+            </span>
+          </span>
+        </div>
+      </a>
+    </div>
+    
+
+    
+    <div class="declare"> 
+      <ul class="post-copyright">
+        <li>
+          <strong>本文作者：</strong>
+          冬生草
+        </li>
+        <li>
+          <strong>本文链接：</strong>
+          <a href="https://linmaq.github.io/2020/03/26/GC and Tuning_1/" title="" target="_blank">https://linmaq.github.io/2020/03/26/GC and Tuning_1/</a>
+        </li>
+        <li>
+          <strong>版权声明： </strong>
+          本博客所有文章除特别声明外，均采用 <a href="https://www.apache.org/licenses/LICENSE-2.0.html" rel="external nofollow" target="_blank">Apache License 2.0</a> 许可协议。转载请注明出处！
+        </li>
+      </ul>
+    </div>
+    
+
+  </div>
+  <div class="article-info article-info-index">
     
     
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
     
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/GC and Tuning_2/" class="archive-article-date">
-        <time datetime="2020-03-26T12:01:53.825Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
 
+    
+
+    
+    
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <!-- <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a> -->
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-    	 
+      </div>
+    </span>
+  </div>
+</div>
 
-        <div class="article-info info-on-right">
-          
-          
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://linmaq.github.io/2020/03/26/GC and Tuning_1/" alt="微信分享二维码"> -->
+    </div>
+</div>
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+<div class="mask js-mask"></div>
+
+    
+    <div class="clearfix"></div>
+  </div>
   </div>
 </article>
+
+
+<nav id="article-nav">
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/GC and Tuning_1/" class="archive-article-date">
-        <time datetime="2020-03-26T12:01:53.803Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/26/gc ZGC_3/" class="archive-article-date">
-        <time datetime="2020-03-26T11:56:32.481Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-26</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/RocketMQ/" class="archive-article-date">
-        <time datetime="2020-03-25T13:15:32.947Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/Active MQ原理/" class="archive-article-date">
-        <time datetime="2020-03-25T13:13:51.313Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/kafka实战/" class="archive-article-date">
-        <time datetime="2020-03-25T12:33:17.554Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/25/Kafka/" class="archive-article-date">
-        <time datetime="2020-03-25T12:32:48.597Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-25</time>
-</a>
-
-        </div>
-    	 
-
-        <div class="article-info info-on-right">
-          
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2020/03/11/重装系统后登录hexo博客/" class="archive-article-date">
-        <time datetime="2020-03-11T06:00:20.436Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-11</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2020/03/11/重装系统后登录hexo博客/" target="_blank">重装系统后登录hexo博客</a>
-  
-    </h1>
-  
-
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">hexo 重装系统</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+    <a href="/2020/03/26/GC and Tuning_2/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
   
   
-    </div></section>
+    <a href="/2020/03/26/gc ZGC_3/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title"></div>
+      <i class="icon-circle-right"></i>
+    </a>
   
+</nav>
 
-    
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
           </div>
@@ -452,8 +923,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,
