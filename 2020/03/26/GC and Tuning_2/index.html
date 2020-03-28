@@ -10,18 +10,18 @@
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾 引用计数 根可">
+  <meta name="description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾">
 <meta name="keywords" content="Java,spring全家桶,html5">
 <meta property="og:type" content="article">
 <meta property="og:title" content="冬生草的学习之旅">
 <meta property="og:url" content="https://linmaq.github.io/2020/03/26/GC and Tuning_2/index.html">
 <meta property="og:site_name" content="冬生草的学习之旅">
-<meta property="og:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾 引用计数 根可">
+<meta property="og:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2020-03-18T09:49:25.295Z">
+<meta property="og:updated_time" content="2020-03-28T06:29:10.932Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="冬生草的学习之旅">
-<meta name="twitter:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾 引用计数 根可">
+<meta name="twitter:description" content="GC和GC Tuning作者：马士兵教育 http://mashibing.com GC的基础知识1.什么是垃圾 C语言申请内存：malloc free C++： new delete Java: new ？ 自动内存回收，编程上简单，系统不容易出错，手动释放内存，容易出两种类型的问题：  忘记回收 多次回收   没有任何引用指向的一个对象或者多个对象（循环引用） 2.如何定位垃圾">
   
     <link rel="alternative" href="/atom.xml" title="冬生草的学习之旅" type="application/atom+xml">
   
@@ -203,7 +203,9 @@
 </ol>
 </blockquote>
 <p>没有任何引用指向的一个对象或者多个对象（循环引用）</p>
-<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4><ol>
+<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4><a id="more"></a>
+
+<ol>
 <li>引用计数</li>
 <li>根可达算法</li>
 </ol>
@@ -398,6 +400,15 @@
 
 
 <nav id="article-nav">
+  
+    <a href="/2020/03/28/synchronized(4)/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          (no title)
+        
+      </div>
+    </a>
   
   
     <a href="/2020/03/26/GC and Tuning_1/" id="article-nav-older" class="article-nav-link-wrap">

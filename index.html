@@ -191,6 +191,59 @@
             
 
   
+    <article id="post-synchronized(4)" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h1 id="用户态与内核态"><a href="#用户态与内核态" class="headerlink" title="用户态与内核态"></a>用户态与内核态</h1><p>JDK1.0，synchronized 叫做重量级锁， 因为申请锁资源必须通过kernel, 系统调用</p>
+    
+    <a class="article-more-a" href="/2020/03/28/synchronized(4)/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2020/03/28/synchronized(4)/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-GC and Tuning_2" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -208,78 +261,10 @@
 </ol>
 </blockquote>
 <p>没有任何引用指向的一个对象或者多个对象（循环引用）</p>
-<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4><ol>
-<li>引用计数</li>
-<li>根可达算法</li>
-</ol>
-<h4 id="3-常见的垃圾回收算法"><a href="#3-常见的垃圾回收算法" class="headerlink" title="3.常见的垃圾回收算法"></a>3.常见的垃圾回收算法</h4><ol>
-<li>标记清除 - 位置不连续 产生碎片</li>
-<li>拷贝算法 - 没有碎片，浪费空间</li>
-<li>标记压缩 - 没有碎片，效率偏低</li>
-</ol>
-<h4 id="4-JVM内存分代模型（用于分代垃圾回收算法）"><a href="#4-JVM内存分代模型（用于分代垃圾回收算法）" class="headerlink" title="4.JVM内存分代模型（用于分代垃圾回收算法）"></a>4.JVM内存分代模型（用于分代垃圾回收算法）</h4><ol>
-<li>部分垃圾回收器使用的模型</li>
-<li>新生代 + 老年代 + 永久代（1.7）/ 元数据区(1.8) Metaspace<ol>
-<li>永久代 元数据 - Class</li>
-<li>永久代必须指定大小限制 ，元数据可以设置，也可以不设置，无上限（受限于物理内存）</li>
-<li>字符串常量 1.7 - 永久代，1.8 - 堆</li>
-<li>MethodArea逻辑概念 - 永久代、元数据</li>
-</ol>
-</li>
-<li>新生代 = Eden + 2个suvivor区 <ol>
-<li>YGC回收之后，大多数的对象会被回收，活着的进入s0</li>
-<li>再次YGC，活着的对象eden + s0 -&gt; s1</li>
-<li>再次YGC，eden + s1 -&gt; s0</li>
-<li>年龄足够 -&gt; 老年代 （15 CMS 6）</li>
-<li>s区装不下 -&gt; 老年代</li>
-</ol>
-</li>
-<li>老年代<ol>
-<li>顽固分子</li>
-<li>老年代满了FGC Full GC</li>
-</ol>
-</li>
-<li>GC Tuning (Generation)<ol>
-<li>尽量减少FGC</li>
-<li>MinorGC = YGC</li>
-<li>MajorGC = FGC</li>
-</ol>
-</li>
-</ol>
-<h4 id="5-常见的垃圾回收器"><a href="#5-常见的垃圾回收器" class="headerlink" title="5.常见的垃圾回收器"></a>5.常见的垃圾回收器</h4><ol>
-<li>Serial 年轻代 串行回收</li>
-<li>PS 年轻代 并行回收</li>
-<li>ParNew 年轻代 配合CMS的并行回收</li>
-<li>SerialOld </li>
-<li>ParallelOld</li>
-<li>ConcurrentMarkSweep 老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms)</li>
-<li>G1(10ms)</li>
-<li>ZGC (1ms) PK C++</li>
-<li>Shenandoah</li>
-<li>Eplison</li>
-</ol>
-<p>1.8默认的垃圾回收：PS + ParallelOld</p>
-<h4 id="6-JVM调优第一步，了解生产环境下的垃圾回收器组合"><a href="#6-JVM调优第一步，了解生产环境下的垃圾回收器组合" class="headerlink" title="6.JVM调优第一步，了解生产环境下的垃圾回收器组合"></a>6.JVM调优第一步，了解生产环境下的垃圾回收器组合</h4><ul>
-<li><p>JVM的命令行参数参考：<a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></p>
-</li>
-<li><p>JVM参数分类</p>
-<blockquote>
-<p>标准： - 开头，所有的HotSpot都支持</p>
-<p>非标准：-X 开头，特定版本HotSpot支持特定命令</p>
-<p>不稳定：-XX 开头，下个版本可能取消</p>
-</blockquote>
-<p>-XX:+PrintCommandLineFlags </p>
-<p>-XX:+PrintFlagsFinal 最终参数值</p>
-<p>-XX:+PrintFlagsInitial 默认参数值</p>
-</li>
-</ul>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
-<li><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">https://blogs.oracle.com/
- </a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">jonthecollector</a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">/our-collectors</a></li>
-<li><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></li>
-<li><a href="http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp" target="_blank" rel="noopener">http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp</a></li>
-</ol>
-
+<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4>
+    
+    <a class="article-more-a" href="/2020/03/26/GC and Tuning_2/#more">more >></a>
+    
     
 
     
@@ -342,511 +327,10 @@
 </ol>
 </blockquote>
 <p>没有任何引用指向的一个对象或者多个对象（循环引用）</p>
-<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4><ol>
-<li>引用计数（ReferenceCount）</li>
-<li>根可达算法(RootSearching)</li>
-</ol>
-<h4 id="3-常见的垃圾回收算法"><a href="#3-常见的垃圾回收算法" class="headerlink" title="3.常见的垃圾回收算法"></a>3.常见的垃圾回收算法</h4><ol>
-<li>标记清除(mark sweep) - 位置不连续 产生碎片 效率偏低（两遍扫描）</li>
-<li>拷贝算法 (copying) - 没有碎片，浪费空间</li>
-<li>标记压缩(mark compact) - 没有碎片，效率偏低（两遍扫描，指针需要调整）</li>
-</ol>
-<h4 id="4-JVM内存分代模型（用于分代垃圾回收算法）"><a href="#4-JVM内存分代模型（用于分代垃圾回收算法）" class="headerlink" title="4.JVM内存分代模型（用于分代垃圾回收算法）"></a>4.JVM内存分代模型（用于分代垃圾回收算法）</h4><ol>
-<li><p>部分垃圾回收器使用的模型</p>
-<blockquote>
-<p>除Epsilon ZGC Shenandoah之外的GC都是使用逻辑分代模型</p>
-<p>G1是逻辑分代，物理不分代</p>
-<p>除此之外不仅逻辑分代，而且物理分代</p>
-</blockquote>
-</li>
-<li><p>新生代 + 老年代 + 永久代（1.7）Perm Generation/ 元数据区(1.8) Metaspace</p>
-<ol>
-<li>永久代 元数据 - Class</li>
-<li>永久代必须指定大小限制 ，元数据可以设置，也可以不设置，无上限（受限于物理内存）</li>
-<li>字符串常量 1.7 - 永久代，1.8 - 堆</li>
-<li>MethodArea逻辑概念 - 永久代、元数据</li>
-</ol>
-</li>
-<li><p>新生代 = Eden + 2个suvivor区 </p>
-<ol>
-<li>YGC回收之后，大多数的对象会被回收，活着的进入s0</li>
-<li>再次YGC，活着的对象eden + s0 -&gt; s1</li>
-<li>再次YGC，eden + s1 -&gt; s0</li>
-<li>年龄足够 -&gt; 老年代 （15 CMS 6）</li>
-<li>s区装不下 -&gt; 老年代</li>
-</ol>
-</li>
-<li><p>老年代</p>
-<ol>
-<li>顽固分子</li>
-<li>老年代满了FGC Full GC</li>
-</ol>
-</li>
-<li><p>GC Tuning (Generation)</p>
-<ol>
-<li>尽量减少FGC</li>
-<li>MinorGC = YGC</li>
-<li>MajorGC = FGC</li>
-</ol>
-</li>
-<li><p>对象分配过程图<br><img src="%E5%AF%B9%E8%B1%A1%E5%88%86%E9%85%8D%E8%BF%87%E7%A8%8B%E8%AF%A6%E8%A7%A3.png" alt></p>
-</li>
-<li><p>动态年龄：（不重要）<br><a href="https://www.jianshu.com/p/989d3b06a49d" target="_blank" rel="noopener">https://www.jianshu.com/p/989d3b06a49d</a></p>
-</li>
-<li><p>分配担保：（不重要）<br>YGC期间 survivor区空间不够了 空间担保直接进入老年代<br>参考：<a href="https://cloud.tencent.com/developer/article/1082730" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1082730</a></p>
-</li>
-</ol>
-<h4 id="5-常见的垃圾回收器"><a href="#5-常见的垃圾回收器" class="headerlink" title="5.常见的垃圾回收器"></a>5.常见的垃圾回收器</h4><p><img src="%E5%B8%B8%E7%94%A8%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8.png" alt="常用垃圾回收器"></p>
-<ol>
-<li>垃圾回收器的发展路线，是随着内存越来越大的过程而演进<br>从分代算法演化到不分代算法<br>Serial算法 几十兆<br>Parallel算法 几个G<br>CMS 几十个G  - 承上启下，开始并发回收 -<br>.- 三色标记 - </li>
-<li>JDK诞生 Serial追随 提高效率，诞生了PS，为了配合CMS，诞生了PN，CMS是1.4版本后期引入，CMS是里程碑式的GC，它开启了并发回收的过程，但是CMS毛病较多，因此目前任何一个JDK版本默认是CMS<br>并发垃圾回收是因为无法忍受STW</li>
-<li>Serial 年轻代 串行回收</li>
-<li>PS 年轻代 并行回收</li>
-<li>ParNew 年轻代 配合CMS的并行回收</li>
-<li>SerialOld </li>
-<li>ParallelOld</li>
-<li>ConcurrentMarkSweep 老年代 并发的， 垃圾回收和应用程序同时运行，降低STW的时间(200ms)<br>CMS问题比较多，所以现在没有一个版本默认是CMS，只能手工指定<br>CMS既然是MarkSweep，就一定会有碎片化的问题，碎片到达一定程度，CMS的老年代分配对象分配不下的时候，使用SerialOld 进行老年代回收<br>想象一下：<br>PS + PO -&gt; 加内存 换垃圾回收器 -&gt; PN + CMS + SerialOld（几个小时 - 几天的STW）<br>几十个G的内存，单线程回收 -&gt; G1 + FGC 几十个G -&gt; 上T内存的服务器 ZGC<br>算法：三色标记 + Incremental Update</li>
-<li>G1(200ms - 10ms)<br>算法：三色标记 + SATB</li>
-<li>ZGC (10ms - 1ms) PK C++<br>算法：ColoredPointers + LoadBarrier</li>
-<li>Shenandoah<br>算法：ColoredPointers + WriteBarrier</li>
-<li>Eplison</li>
-<li>PS 和 PN区别的延伸阅读：<br>▪<a href="https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html" target="_blank" rel="noopener">https://docs.oracle.com/en/java/javase/13/gctuning/ergonomics.html#GUID-3D0BB91E-9BFF-4EBB-B523-14493A860E73</a></li>
-<li>垃圾收集器跟内存大小的关系<ol>
-<li>Serial 几十兆</li>
-<li>PS 上百兆 - 几个G</li>
-<li>CMS - 20G</li>
-<li>G1 - 上百G</li>
-<li>ZGC - 4T - 16T（JDK13）</li>
-</ol>
-</li>
-</ol>
-<p>1.8默认的垃圾回收：PS + ParallelOld</p>
-<h3 id="常见垃圾回收器组合参数设定：-1-8"><a href="#常见垃圾回收器组合参数设定：-1-8" class="headerlink" title="常见垃圾回收器组合参数设定：(1.8)"></a>常见垃圾回收器组合参数设定：(1.8)</h3><ul>
-<li><p>-XX:+UseSerialGC = Serial New (DefNew) + Serial Old</p>
-<ul>
-<li>小型程序。默认情况下不会是这种选项，HotSpot会根据计算及配置和JDK版本自动选择收集器</li>
-</ul>
-</li>
-<li><p>-XX:+UseParNewGC = ParNew + SerialOld</p>
-<ul>
-<li>这个组合已经很少用（在某些版本中已经废弃）</li>
-<li><a href="https://stackoverflow.com/questions/34962257/why-remove-support-for-parnewserialold-anddefnewcms-in-the-future" target="_blank" rel="noopener">https://stackoverflow.com/questions/34962257/why-remove-support-for-parnewserialold-anddefnewcms-in-the-future</a></li>
-</ul>
-</li>
-<li><p>-XX:+UseConc<font color="red">(urrent)</font>MarkSweepGC = ParNew + CMS + Serial Old</p>
-</li>
-<li><p>-XX:+UseParallelGC = Parallel Scavenge + Parallel Old (1.8默认) 【PS + SerialOld】</p>
-</li>
-<li><p>-XX:+UseParallelOldGC = Parallel Scavenge + Parallel Old</p>
-</li>
-<li><p>-XX:+UseG1GC = G1</p>
-</li>
-<li><p>Linux中没找到默认GC的查看方法，而windows中会打印UseParallelGC </p>
-<ul>
-<li>java +XX:+PrintCommandLineFlags -version</li>
-<li>通过GC的日志来分辨</li>
-</ul>
-</li>
-<li><p>Linux下1.8版本默认的垃圾回收器到底是什么？</p>
-<ul>
-<li>1.8.0_181 默认（看不出来）Copy MarkCompact</li>
-<li>1.8.0_222 默认 PS + PO</li>
-</ul>
-</li>
-</ul>
-<h3 id="JVM调优第一步，了解JVM常用命令行参数"><a href="#JVM调优第一步，了解JVM常用命令行参数" class="headerlink" title="JVM调优第一步，了解JVM常用命令行参数"></a>JVM调优第一步，了解JVM常用命令行参数</h3><ul>
-<li><p>JVM的命令行参数参考：<a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></p>
-</li>
-<li><p>HotSpot参数分类</p>
-<blockquote>
-<p>标准： - 开头，所有的HotSpot都支持</p>
-<p>非标准：-X 开头，特定版本HotSpot支持特定命令</p>
-<p>不稳定：-XX 开头，下个版本可能取消</p>
-</blockquote>
-<p>java -version</p>
-<p>java -X</p>
-</li>
-</ul>
-<p>  java -XX:+PrintFlagsWithComments //只有debug版本能用</p>
-<p>  试验用程序：</p>
-  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">import</span> java.util.List;</span><br><span class="line">  <span class="keyword">import</span> java.util.LinkedList;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloGC</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">      System.out.println(<span class="string">"HelloGC!"</span>);</span><br><span class="line">      List list = <span class="keyword">new</span> LinkedList();</span><br><span class="line">      <span class="keyword">for</span>(;;) &#123;</span><br><span class="line">        <span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>*<span class="number">1024</span>];</span><br><span class="line">        list.add(b);</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-<ol>
-<li>区分概念：内存泄漏memory leak，内存溢出out of memory</li>
-<li>java -XX:+PrintCommandLineFlags HelloGC</li>
-<li>java -Xmn10M -Xms40M -Xmx60M -XX:+PrintCommandLineFlags -XX:+PrintGC  HelloGC<br>PrintGCDetails PrintGCTimeStamps PrintGCCauses</li>
-<li>java -XX:+UseConcMarkSweepGC -XX:+PrintCommandLineFlags HelloGC</li>
-<li>java -XX:+PrintFlagsInitial 默认参数值</li>
-<li>java -XX:+PrintFlagsFinal 最终参数值</li>
-<li>java -XX:+PrintFlagsFinal | grep xxx 找到对应的参数</li>
-<li>java -XX:+PrintFlagsFinal -version |grep GC</li>
-<li>java -XX:+PrintFlagsFinal -version | wc -l<br>共728个参数</li>
-</ol>
-<h3 id="PS-GC日志详解"><a href="#PS-GC日志详解" class="headerlink" title="PS GC日志详解"></a>PS GC日志详解</h3><p>每种垃圾回收器的日志格式是不同的！</p>
-<p>PS日志格式</p>
-<p><img src="./GC%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3.png" alt="GC日志详解"></p>
-<p>heap dump部分：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">eden space <span class="number">5632</span>K, <span class="number">94</span>% used [<span class="number">0x00000000ff980000</span>,<span class="number">0x00000000ffeb3e28</span>,<span class="number">0x00000000fff00000</span>)</span><br><span class="line">                            后面的内存地址指的是，起始地址，使用空间结束地址，整体空间结束地址</span><br></pre></td></tr></table></figure>
-
-<p><img src="GCHeapDump.png" alt="GCHeapDump"></p>
-<p>total = eden + 1个survivor</p>
-<h3 id="调优前的基础概念："><a href="#调优前的基础概念：" class="headerlink" title="调优前的基础概念："></a>调优前的基础概念：</h3><ol>
-<li>吞吐量：用户代码时间 /（用户代码执行时间 + 垃圾回收时间）</li>
-<li>响应时间：STW越短，响应时间越好</li>
-</ol>
-<p>所谓调优，首先确定，追求啥？吞吐量优先，还是响应时间优先？还是在满足一定的响应时间的情况下，要求达到多大的吞吐量…</p>
-<p>问题：</p>
-<p>科学计算，吞吐量。数据挖掘，thrput。吞吐量优先的一般：（PS + PO）</p>
-<p>响应时间：网站 GUI API （1.8 G1）</p>
-<h3 id="什么是调优？"><a href="#什么是调优？" class="headerlink" title="什么是调优？"></a>什么是调优？</h3><ol>
-<li>根据需求进行JVM规划和预调优</li>
-<li>优化运行JVM运行环境（慢，卡顿）</li>
-<li>解决JVM运行过程中出现的各种问题(OOM)</li>
-</ol>
-<h3 id="调优，从规划开始"><a href="#调优，从规划开始" class="headerlink" title="调优，从规划开始"></a>调优，从规划开始</h3><ul>
-<li><p>调优，从业务场景开始，没有业务场景的调优都是耍流氓</p>
-</li>
-<li><p>无监控（压力测试，能看到结果），不调优</p>
-</li>
-<li><p>步骤：</p>
-<ol>
-<li>熟悉业务场景（没有最好的垃圾回收器，只有最合适的垃圾回收器）<ol>
-<li>响应时间、停顿时间 [CMS G1 ZGC] （需要给用户作响应）</li>
-<li>吞吐量 = 用户时间 /( 用户时间 + GC时间) [PS]</li>
-</ol>
-</li>
-<li>选择回收器组合</li>
-<li>计算内存需求（经验值 1.5G 16G）</li>
-<li>选定CPU（越高越好）</li>
-<li>设定年代大小、升级年龄</li>
-<li>设定日志参数<ol>
-<li>-Xloggc:/opt/xxx/logs/xxx-xxx-gc-%t.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=20M -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause</li>
-<li>或者每天产生一个日志文件</li>
-</ol>
-</li>
-<li>观察日志情况</li>
-</ol>
-</li>
-<li><p>案例1：垂直电商，最高每日百万订单，处理订单系统需要什么样的服务器配置？</p>
-<blockquote>
-<p>这个问题比较业余，因为很多不同的服务器配置都能支撑(1.5G 16G)</p>
-<p>1小时360000集中时间段， 100个订单/秒，（找一小时内的高峰期，1000订单/秒）</p>
-<p>经验值，</p>
-<p>非要计算：一个订单产生需要多少内存？512K * 1000 500M内存</p>
-<p>专业一点儿问法：要求响应时间100ms</p>
-<p>压测！</p>
-</blockquote>
-</li>
-<li><p>案例2：12306遭遇春节大规模抢票应该如何支撑？</p>
-<blockquote>
-<p>12306应该是中国并发量最大的秒杀网站：</p>
-<p>号称并发量100W最高</p>
-<p>CDN -&gt; LVS -&gt; NGINX -&gt; 业务系统 -&gt; 每台机器1W并发（10K问题） 100台机器</p>
-<p>普通电商订单 -&gt; 下单 -&gt;订单系统（IO）减库存 -&gt;等待用户付款</p>
-<p>12306的一种可能的模型： 下单 -&gt; 减库存 和 订单(redis kafka) 同时异步进行 -&gt;等付款</p>
-<p>减库存最后还会把压力压到一台服务器</p>
-<p>可以做分布式本地库存 + 单独服务器做库存均衡</p>
-<p>大流量的处理方法：分而治之</p>
-</blockquote>
-</li>
-<li><p>怎么得到一个事务会消耗多少内存？</p>
-<blockquote>
-<ol>
-<li><p>弄台机器，看能承受多少TPS？是不是达到目标？扩容或调优，让它达到</p>
-</li>
-<li><p>用压测来确定</p>
-</li>
-</ol>
-</blockquote>
-</li>
-</ul>
-<h3 id="优化环境"><a href="#优化环境" class="headerlink" title="优化环境"></a>优化环境</h3><ol>
-<li>有一个50万PV的资料类网站（从磁盘提取文档到内存）原服务器32位，1.5G<br>的堆，用户反馈网站比较缓慢，因此公司决定升级，新的服务器为64位，16G<br>的堆内存，结果用户反馈卡顿十分严重，反而比以前效率更低了<ol>
-<li>为什么原网站慢?<br>很多用户浏览数据，很多数据load到内存，内存不足，频繁GC，STW长，响应时间变慢</li>
-<li>为什么会更卡顿？<br>内存越大，FGC时间越长</li>
-<li>咋办？<br>PS -&gt; PN + CMS 或者 G1</li>
-</ol>
-</li>
-<li>系统CPU经常100%，如何调优？(面试高频)<br>CPU100%那么一定有线程在占用系统资源，<ol>
-<li>找出哪个进程cpu高（top）</li>
-<li>该进程中的哪个线程cpu高（top -Hp）</li>
-<li>导出该线程的堆栈 (jstack)</li>
-<li>查找哪个方法（栈帧）消耗时间 (jstack)</li>
-<li>工作线程占比高 | 垃圾回收线程占比高</li>
-</ol>
-</li>
-<li>系统内存飙高，如何查找问题？（面试高频）<ol>
-<li>导出堆内存 (jmap)</li>
-<li>分析 (jhat jvisualvm mat jprofiler … )</li>
-</ol>
-</li>
-<li>如何监控JVM<ol>
-<li>jstat jvisualvm jprofiler arthas top…</li>
-</ol>
-</li>
-</ol>
-<h3 id="解决JVM运行中的问题"><a href="#解决JVM运行中的问题" class="headerlink" title="解决JVM运行中的问题"></a>解决JVM运行中的问题</h3><h4 id="一个案例理解常用工具"><a href="#一个案例理解常用工具" class="headerlink" title="一个案例理解常用工具"></a>一个案例理解常用工具</h4><ol>
-<li><p>测试代码：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.mashibing.jvm.gc;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.math.BigDecimal;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ScheduledThreadPoolExecutor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ThreadPoolExecutor;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.TimeUnit;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 从数据库中读取信用数据，套用模型，并把结果进行记录和传输</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">T15_FullGC_Problem01</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CardInfo</span> </span>&#123;</span><br><span class="line">        BigDecimal price = <span class="keyword">new</span> BigDecimal(<span class="number">0.0</span>);</span><br><span class="line">        String name = <span class="string">"张三"</span>;</span><br><span class="line">        <span class="keyword">int</span> age = <span class="number">5</span>;</span><br><span class="line">        Date birthdate = <span class="keyword">new</span> Date();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">m</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ScheduledThreadPoolExecutor executor = <span class="keyword">new</span> ScheduledThreadPoolExecutor(<span class="number">50</span>,</span><br><span class="line">            <span class="keyword">new</span> ThreadPoolExecutor.DiscardOldestPolicy());</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        executor.setMaximumPoolSize(<span class="number">50</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (;;)&#123;</span><br><span class="line">            modelFit();</span><br><span class="line">            Thread.sleep(<span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">modelFit</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;CardInfo&gt; taskList = getAllCardInfo();</span><br><span class="line">        taskList.forEach(info -&gt; &#123;</span><br><span class="line">            <span class="comment">// do something</span></span><br><span class="line">            executor.scheduleWithFixedDelay(() -&gt; &#123;</span><br><span class="line">                <span class="comment">//do sth with info</span></span><br><span class="line">                info.m();</span><br><span class="line"></span><br><span class="line">            &#125;, <span class="number">2</span>, <span class="number">3</span>, TimeUnit.SECONDS);</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> List&lt;CardInfo&gt; <span class="title">getAllCardInfo</span><span class="params">()</span></span>&#123;</span><br><span class="line">        List&lt;CardInfo&gt; taskList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            CardInfo ci = <span class="keyword">new</span> CardInfo();</span><br><span class="line">            taskList.add(ci);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> taskList;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>java -Xms200M -Xmx200M -XX:+PrintGC com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
-</li>
-<li><p>一般是运维团队首先受到报警信息（CPU Memory）</p>
-</li>
-<li><p>top命令观察到问题：内存不断增长 CPU占用率居高不下</p>
-</li>
-<li><p>top -Hp 观察进程中的线程，哪个线程CPU和内存占比高</p>
-</li>
-<li><p>jps定位具体java进程<br>jstack 定位线程状况，重点关注：WAITING BLOCKED<br>eg.<br>waiting on &lt;0x0000000088ca3310&gt; (a java.lang.Object)<br>假如有一个进程中100个线程，很多线程都在waiting on <xx> ，一定要找到是哪个线程持有这把锁<br>怎么找？搜索jstack dump的信息，找<xx> ，看哪个线程持有这把锁RUNNABLE<br>作业：1：写一个死锁程序，用jstack观察 2 ：写一个程序，一个线程持有锁不释放，其他线程等待</xx></xx></p>
-</li>
-<li><p>为什么阿里规范里规定，线程的名称（尤其是线程池）都要写有意义的名称<br>怎么样自定义线程池里的线程名称？（自定义ThreadFactory）</p>
-</li>
-<li><p>jinfo pid </p>
-</li>
-<li><p>jstat -gc 动态观察gc情况 / 阅读GC日志发现频繁GC / arthas观察 / jconsole/jvisualVM/ Jprofiler（最好用）<br>jstat -gc 4655 500 : 每个500个毫秒打印GC的情况<br>如果面试官问你是怎么定位OOM问题的？如果你回答用图形界面（错误）<br>1：已经上线的系统不用图形界面用什么？（cmdline arthas）<br>2：图形界面到底用在什么地方？测试！测试的时候进行监控！（压测观察）</p>
-</li>
-<li><p>jmap - histo 4655 | head -20，查找有多少对象产生</p>
-</li>
-<li><p>jmap -dump:format=b,file=xxx pid ：</p>
-<p>线上系统，内存特别大，jmap执行期间会对进程产生很大影响，甚至卡顿（电商不适合）<br>1：设定了参数HeapDump，OOM的时候会自动产生堆转储文件（不是很专业，因为多有监控，内存增长就会报警）<br>2：<font color="red">很多服务器备份（高可用），停掉这台服务器对其他服务器不影响</font><br>3：在线定位(一般小点儿公司用不到)</p>
-<p>4：在测试环境中压测（产生类似内存增长问题，在堆还不是很大的时候进行转储）</p>
-</li>
-<li><p>java -Xms20M -Xmx20M -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
-</li>
-<li><p>使用MAT / jhat /jvisualvm 进行dump文件分析<br> <a href="https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html" target="_blank" rel="noopener">https://www.cnblogs.com/baihuitestsoftware/articles/6406271.html</a><br>jhat -J-mx512M xxx.dump<br><a href="http://192.168.17.11:7000" target="_blank" rel="noopener">http://192.168.17.11:7000</a><br>拉到最后：找到对应链接<br>可以使用OQL查找特定问题对象</p>
-</li>
-<li><p>找到代码的问题</p>
-</li>
-</ol>
-<h4 id="jconsole远程连接"><a href="#jconsole远程连接" class="headerlink" title="jconsole远程连接"></a>jconsole远程连接</h4><ol>
-<li><p>程序启动加入参数：</p>
-<blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> java -Djava.rmi.server.hostname=192.168.17.11 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=11111 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false XXX</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
-</blockquote>
-</li>
-<li><p>如果遭遇 Local host name unknown：XXX的错误，修改/etc/hosts文件，把XXX加入进去</p>
-<blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="number">192.168</span><span class="number">.17</span><span class="number">.11</span> basic localhost localhost.localdomain localhost4 localhost4.localdomain4</span><br><span class="line">&gt; ::<span class="number">1</span>         localhost localhost.localdomain localhost6 localhost6.localdomain6</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-</li>
-<li><p>关闭linux防火墙（实战中应该打开对应端口）</p>
-<blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> service iptables stop</span><br><span class="line"><span class="meta">&gt;</span> chkconfig iptables off #永久关闭</span><br><span class="line"><span class="meta">&gt;</span></span><br></pre></td></tr></table></figure>
-</blockquote>
-</li>
-<li><p>windows上打开 jconsole远程连接 192.168.17.11:11111</p>
-</li>
-</ol>
-<h4 id="jvisualvm远程连接"><a href="#jvisualvm远程连接" class="headerlink" title="jvisualvm远程连接"></a>jvisualvm远程连接</h4><p> <a href="https://www.cnblogs.com/liugh/p/7620336.html" target="_blank" rel="noopener">https://www.cnblogs.com/liugh/p/7620336.html</a> （简单做法）</p>
-<h4 id="jprofiler-收费"><a href="#jprofiler-收费" class="headerlink" title="jprofiler (收费)"></a>jprofiler (收费)</h4><h4 id="arthas在线排查工具"><a href="#arthas在线排查工具" class="headerlink" title="arthas在线排查工具"></a>arthas在线排查工具</h4><ul>
-<li>为什么需要在线排查？<br> 在生产上我们经常会碰到一些不好排查的问题，例如线程安全问题，用最简单的threaddump或者heapdump不好查到问题原因。为了排查这些问题，有时我们会临时加一些日志，比如在一些关键的函数里打印出入参，然后重新打包发布，如果打了日志还是没找到问题，继续加日志，重新打包发布。对于上线流程复杂而且审核比较严的公司，从改代码到上线需要层层的流转，会大大影响问题排查的进度。 </li>
-<li>jvm观察jvm信息</li>
-<li>thread定位线程问题</li>
-<li>dashboard 观察系统情况</li>
-<li>heapdump + jhat分析</li>
-<li>jad反编译<br> 动态代理生成类的问题定位<br> 第三方的类（观察代码）<br> 版本问题（确定自己最新提交的版本是不是被使用）</li>
-<li>redefine 热替换<br> 目前有些限制条件：只能改方法实现（方法已经运行完成），不能改方法名， 不能改属性<br> m() -&gt; mm()</li>
-<li>sc  - search class</li>
-<li>watch  - watch method</li>
-<li>没有包含的功能：jmap</li>
-</ul>
-<h3 id="GC算法的基础概念"><a href="#GC算法的基础概念" class="headerlink" title="GC算法的基础概念"></a>GC算法的基础概念</h3><ul>
-<li>Card Table<br>由于做YGC时，需要扫描整个OLD区，效率非常低，所以JVM设计了CardTable， 如果一个OLD区CardTable中有对象指向Y区，就将它设为Dirty，下次扫描时，只需要扫描Dirty Card<br>在结构上，Card Table用BitMap来实现</li>
-</ul>
-<h3 id="CMS"><a href="#CMS" class="headerlink" title="CMS"></a>CMS</h3><h4 id="CMS的问题"><a href="#CMS的问题" class="headerlink" title="CMS的问题"></a>CMS的问题</h4><ol>
-<li><p>Memory Fragmentation</p>
-<blockquote>
-<p>-XX:+UseCMSCompactAtFullCollection<br>-XX:CMSFullGCsBeforeCompaction 默认为0 指的是经过多少次FGC才进行压缩</p>
-</blockquote>
-</li>
-<li><p>Floating Garbage</p>
-<blockquote>
-<p>Concurrent Mode Failure<br>产生：if the concurrent collector is unable to finish reclaiming the unreachable objects before the tenured generation fills up, or if an allocation cannot be satisfiedwith the available free space blocks in the tenured generation, then theapplication is paused and the collection is completed with all the applicationthreads stopped</p>
-<p>解决方案：降低触发CMS的阈值</p>
-<p>PromotionFailed</p>
-<p>解决方案类似，保持老年代有足够的空间</p>
-<p>–XX:CMSInitiatingOccupancyFraction 92% 可以降低这个值，让CMS保持老年代足够的空间</p>
-</blockquote>
-</li>
-</ol>
-<h4 id="CMS日志分析"><a href="#CMS日志分析" class="headerlink" title="CMS日志分析"></a>CMS日志分析</h4><p>执行命令：java -Xms20M -Xmx20M -XX:+PrintGCDetails -XX:+UseConcMarkSweepGC com.mashibing.jvm.gc.T15_FullGC_Problem01</p>
-<p>[GC (Allocation Failure) [ParNew: 6144K-&gt;640K(6144K), 0.0265885 secs] 6585K-&gt;2770K(19840K), 0.0268035 secs] [Times: user=0.02 sys=0.00, real=0.02 secs] </p>
-<blockquote>
-<p>ParNew：年轻代收集器</p>
-<p>6144-&gt;640：收集前后的对比</p>
-<p>（6144）：整个年轻代容量</p>
-<p>6585 -&gt; 2770：整个堆的情况</p>
-<p>（19840）：整个堆大小</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[GC (CMS Initial Mark) [<span class="number">1</span> CMS-initial-mark: <span class="number">8511</span>K(<span class="number">13696</span>K)] <span class="number">9866</span>K(<span class="number">19840</span>K), <span class="number">0.0040321</span> secs] [Times: user=<span class="number">0.01</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">	<span class="comment">//8511 (13696) : 老年代使用（最大）</span></span><br><span class="line">	<span class="comment">//9866 (19840) : 整个堆使用（最大）</span></span><br><span class="line">[CMS-concurrent-mark-start]</span><br><span class="line">[CMS-concurrent-mark: <span class="number">0.018</span>/<span class="number">0.018</span> secs] [Times: user=<span class="number">0.01</span> sys=<span class="number">0.00</span>, real=<span class="number">0.02</span> secs] </span><br><span class="line">	<span class="comment">//这里的时间意义不大，因为是并发执行</span></span><br><span class="line">[CMS-concurrent-preclean-start]</span><br><span class="line">[CMS-concurrent-preclean: <span class="number">0.000</span>/<span class="number">0.000</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">	<span class="comment">//标记Card为Dirty，也称为Card Marking</span></span><br><span class="line">[GC (CMS Final Remark) [YG occupancy: 1597 K (6144 K)][Rescan (parallel) , 0.0008396 secs][weak refs processing, 0.0000138 secs][class unloading, 0.0005404 secs][scrub symbol table, 0.0006169 secs][scrub string table, 0.0004903 secs][1 CMS-remark: 8511K(13696K)] 10108K(19840K), 0.0039567 secs] [Times: user=0.00 sys=0.00, real=0.00 secs] </span><br><span class="line">	<span class="comment">//STW阶段，YG occupancy:年轻代占用及容量</span></span><br><span class="line">	<span class="comment">//[Rescan (parallel)：STW下的存活对象标记</span></span><br><span class="line">	<span class="comment">//weak refs processing: 弱引用处理</span></span><br><span class="line">	<span class="comment">//class unloading: 卸载用不到的class</span></span><br><span class="line">	<span class="comment">//scrub symbol(string) table: </span></span><br><span class="line">		<span class="comment">//cleaning up symbol and string tables which hold class-level metadata and </span></span><br><span class="line">		<span class="comment">//internalized string respectively</span></span><br><span class="line">	<span class="comment">//CMS-remark: 8511K(13696K): 阶段过后的老年代占用及容量</span></span><br><span class="line">	<span class="comment">//10108K(19840K): 阶段过后的堆占用及容量</span></span><br><span class="line"></span><br><span class="line">[CMS-concurrent-sweep-start]</span><br><span class="line">[CMS-concurrent-sweep: <span class="number">0.005</span>/<span class="number">0.005</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">	<span class="comment">//标记已经完成，进行并发清理</span></span><br><span class="line">[CMS-concurrent-reset-start]</span><br><span class="line">[CMS-concurrent-reset: <span class="number">0.000</span>/<span class="number">0.000</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs]</span><br><span class="line">	<span class="comment">//重置内部结构，为下次GC做准备</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="G1"><a href="#G1" class="headerlink" title="G1"></a>G1</h3><ol>
-<li>▪<a href="https://www.oracle.com/technical-resources/articles/java/g1gc.html" target="_blank" rel="noopener">https://www.oracle.com/technical-resources/articles/java/g1gc.html</a></li>
-</ol>
-<h4 id="G1日志详解"><a href="#G1日志详解" class="headerlink" title="G1日志详解"></a>G1日志详解</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">[<span class="function">GC <span class="title">pause</span> <span class="params">(G1 Evacuation Pause)</span> <span class="params">(young)</span> <span class="params">(initial-mark)</span>, 0.0015790 secs]</span></span><br><span class="line"><span class="function"><span class="comment">//young -&gt; 年轻代 Evacuation-&gt; 复制存活对象 </span></span></span><br><span class="line"><span class="function"><span class="comment">//initial-mark 混合回收的阶段，这里是YGC混合老年代回收</span></span></span><br><span class="line"><span class="function">   [Parallel Time: 1.5 ms, GC Workers: 1] <span class="comment">//一个GC线程</span></span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Start</span> <span class="params">(ms)</span>:  92635.7]</span></span><br><span class="line"><span class="function">      [Ext Root <span class="title">Scanning</span> <span class="params">(ms)</span>:  1.1]</span></span><br><span class="line"><span class="function">      [Update <span class="title">RS</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">         [Processed Buffers:  1]</span></span><br><span class="line"><span class="function">      [Scan <span class="title">RS</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [Code Root <span class="title">Scanning</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [Object <span class="title">Copy</span> <span class="params">(ms)</span>:  0.1]</span></span><br><span class="line"><span class="function">      [<span class="title">Termination</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">         [Termination Attempts:  1]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Other</span> <span class="params">(ms)</span>:  0.0]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">Total</span> <span class="params">(ms)</span>:  1.2]</span></span><br><span class="line"><span class="function">      [GC Worker <span class="title">End</span> <span class="params">(ms)</span>:  92636.9]</span></span><br><span class="line"><span class="function">   [Code Root Fixup: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Code Root Purge: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Clear CT: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Other: 0.1 ms]</span></span><br><span class="line"><span class="function">      [Choose CSet: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Ref Proc: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Ref Enq: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Redirty Cards: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Humongous Register: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Humongous Reclaim: 0.0 ms]</span></span><br><span class="line"><span class="function">      [Free CSet: 0.0 ms]</span></span><br><span class="line"><span class="function">   [Eden: 0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span>-&gt;0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span> Survivors: 0.0B-&gt;0.0B Heap: 18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>-&gt;18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>]</span></span><br><span class="line"><span class="function"> [Times: user</span>=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line"><span class="comment">//以下是混合回收其他阶段</span></span><br><span class="line">[GC concurrent-root-region-scan-start]</span><br><span class="line">[GC concurrent-root-region-scan-end, <span class="number">0.0000078</span> secs]</span><br><span class="line">[GC concurrent-mark-start]</span><br><span class="line"><span class="comment">//无法evacuation，进行FGC</span></span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Allocation Failure)</span>  18M-&gt;18<span class="title">M</span><span class="params">(<span class="number">20</span>M)</span>, 0.0719656 secs]</span></span><br><span class="line"><span class="function">   [Eden: 0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span>-&gt;0.0<span class="title">B</span><span class="params">(<span class="number">1024.0</span>K)</span> Survivors: 0.0B-&gt;0.0B Heap: 18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>-&gt;18.8<span class="title">M</span><span class="params">(<span class="number">20.0</span>M)</span>], [Metaspace: 38</span></span><br><span class="line"><span class="function">76K-&gt;3876<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>] [Times: user</span>=<span class="number">0.07</span> sys=<span class="number">0.00</span>, real=<span class="number">0.07</span> secs]</span><br></pre></td></tr></table></figure>
-
-<h3 id="案例汇总"><a href="#案例汇总" class="headerlink" title="案例汇总"></a>案例汇总</h3><p>OOM产生的原因多种多样，有些程序未必产生OOM，不断FGC(CPU飙高，但内存回收特别少) （上面案例）</p>
-<ol>
-<li><p>硬件升级系统反而卡顿的问题（见上）</p>
-</li>
-<li><p>线程池不当运用产生OOM问题（见上）<br>不断的往List里加对象（实在太LOW）</p>
-</li>
-<li><p>smile jira问题<br>实际系统不断重启<br>解决问题 加内存 + 更换垃圾回收器 G1<br>真正问题在哪儿？不知道</p>
-</li>
-<li><p>tomcat http-header-size过大问题（Hector）</p>
-</li>
-<li><p>lambda表达式导致方法区溢出问题(MethodArea / Perm Metaspace)<br>LambdaGC.java     -XX:MaxMetaspaceSize=9M -XX:+PrintGCDetails</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"C:\Program Files\Java\jdk1.8.0_181\bin\java.exe"</span> -XX:MaxMetaspaceSize=<span class="number">9</span>M -XX:+PrintGCDetails <span class="string">"-javaagent:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\lib\idea_rt.jar=49316:C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2019.1\bin"</span> -Dfile.encoding=UTF-<span class="number">8</span> -classpath <span class="string">"C:\Program Files\Java\jdk1.8.0_181\jre\lib\charsets.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\deploy.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\access-bridge-64.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\cldrdata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\dnsns.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jaccess.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\jfxrt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\localedata.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\nashorn.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunec.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunjce_provider.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunmscapi.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\sunpkcs11.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\ext\zipfs.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\javaws.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jce.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfr.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jfxswt.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\jsse.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\management-agent.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\plugin.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\resources.jar;C:\Program Files\Java\jdk1.8.0_181\jre\lib\rt.jar;C:\work\ijprojects\JVM\out\production\JVM;C:\work\ijprojects\ObjectSize\out\artifacts\ObjectSize_jar\ObjectSize.jar"</span> com.mashibing.jvm.gc.LambdaGC</span><br><span class="line">[GC (Metadata GC Threshold) [PSYoungGen: <span class="number">11341</span>K-&gt;<span class="number">1880</span>K(<span class="number">38400</span>K)] <span class="number">11341</span>K-&gt;<span class="number">1888</span>K(<span class="number">125952</span>K), <span class="number">0.0022190</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Metadata GC Threshold)</span> [PSYoungGen: 1880K-&gt;0<span class="title">K</span><span class="params">(<span class="number">38400</span>K)</span>] [ParOldGen: 8K-&gt;1777<span class="title">K</span><span class="params">(<span class="number">35328</span>K)</span>] 1888K-&gt;1777<span class="title">K</span><span class="params">(<span class="number">73728</span>K)</span>, [Metaspace: 8164K-&gt;8164<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>], 0.0100681 secs] [Times: user</span>=<span class="number">0.02</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">[GC (Last ditch collection) [PSYoungGen: <span class="number">0</span>K-&gt;<span class="number">0</span>K(<span class="number">38400</span>K)] <span class="number">1777</span>K-&gt;<span class="number">1777</span>K(<span class="number">73728</span>K), <span class="number">0.0005698</span> secs] [Times: user=<span class="number">0.00</span> sys=<span class="number">0.00</span>, real=<span class="number">0.00</span> secs] </span><br><span class="line">[<span class="function">Full <span class="title">GC</span> <span class="params">(Last ditch collection)</span> [PSYoungGen: 0K-&gt;0<span class="title">K</span><span class="params">(<span class="number">38400</span>K)</span>] [ParOldGen: 1777K-&gt;1629<span class="title">K</span><span class="params">(<span class="number">67584</span>K)</span>] 1777K-&gt;1629<span class="title">K</span><span class="params">(<span class="number">105984</span>K)</span>, [Metaspace: 8164K-&gt;8156<span class="title">K</span><span class="params">(<span class="number">1056768</span>K)</span>], 0.0124299 secs] [Times: user</span>=<span class="number">0.06</span> sys=<span class="number">0.00</span>, real=<span class="number">0.01</span> secs] </span><br><span class="line">java.lang.reflect.InvocationTargetException</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)</span><br><span class="line">	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:<span class="number">62</span>)</span><br><span class="line">	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="number">43</span>)</span><br><span class="line">	at java.lang.reflect.Method.invoke(Method.java:<span class="number">498</span>)</span><br><span class="line">	at sun.instrument.InstrumentationImpl.loadClassAndStartAgent(InstrumentationImpl.java:<span class="number">388</span>)</span><br><span class="line">	at sun.instrument.InstrumentationImpl.loadClassAndCallAgentmain(InstrumentationImpl.java:<span class="number">411</span>)</span><br><span class="line">Caused by: java.lang.OutOfMemoryError: Compressed <span class="class"><span class="keyword">class</span> <span class="title">space</span></span></span><br><span class="line"><span class="class">	<span class="title">at</span> <span class="title">sun</span>.<span class="title">misc</span>.<span class="title">Unsafe</span>.<span class="title">defineClass</span>(<span class="title">Native</span> <span class="title">Method</span>)</span></span><br><span class="line">	at sun.reflect.ClassDefiner.defineClass(ClassDefiner.java:63)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator$<span class="number">1</span>.run(MethodAccessorGenerator.java:<span class="number">399</span>)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator$<span class="number">1</span>.run(MethodAccessorGenerator.java:<span class="number">394</span>)</span><br><span class="line">	at java.security.AccessController.doPrivileged(Native Method)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator.generate(MethodAccessorGenerator.java:<span class="number">393</span>)</span><br><span class="line">	at sun.reflect.MethodAccessorGenerator.generateSerializationConstructor(MethodAccessorGenerator.java:<span class="number">112</span>)</span><br><span class="line">	at sun.reflect.ReflectionFactory.generateConstructor(ReflectionFactory.java:<span class="number">398</span>)</span><br><span class="line">	at sun.reflect.ReflectionFactory.newConstructorForSerialization(ReflectionFactory.java:<span class="number">360</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.getSerializableConstructor(ObjectStreamClass.java:<span class="number">1574</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.access$<span class="number">1500</span>(ObjectStreamClass.java:<span class="number">79</span>)</span><br><span class="line">	at java.io.ObjectStreamClass$<span class="number">3</span>.run(ObjectStreamClass.java:<span class="number">519</span>)</span><br><span class="line">	at java.io.ObjectStreamClass$<span class="number">3</span>.run(ObjectStreamClass.java:<span class="number">494</span>)</span><br><span class="line">	at java.security.AccessController.doPrivileged(Native Method)</span><br><span class="line">	at java.io.ObjectStreamClass.&lt;init&gt;(ObjectStreamClass.java:<span class="number">494</span>)</span><br><span class="line">	at java.io.ObjectStreamClass.lookup(ObjectStreamClass.java:<span class="number">391</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="number">1134</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.defaultWriteFields(ObjectOutputStream.java:<span class="number">1548</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeSerialData(ObjectOutputStream.java:<span class="number">1509</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeOrdinaryObject(ObjectOutputStream.java:<span class="number">1432</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject0(ObjectOutputStream.java:<span class="number">1178</span>)</span><br><span class="line">	at java.io.ObjectOutputStream.writeObject(ObjectOutputStream.java:<span class="number">348</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeJRMPStub(RMIConnectorServer.java:<span class="number">727</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeStub(RMIConnectorServer.java:<span class="number">719</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.encodeStubInAddress(RMIConnectorServer.java:<span class="number">690</span>)</span><br><span class="line">	at javax.management.remote.rmi.RMIConnectorServer.start(RMIConnectorServer.java:<span class="number">439</span>)</span><br><span class="line">	at sun.management.jmxremote.ConnectorBootstrap.startLocalConnectorServer(ConnectorBootstrap.java:<span class="number">550</span>)</span><br><span class="line">	at sun.management.Agent.startLocalManagementAgent(Agent.java:<span class="number">137</span>)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>直接内存溢出问题（少见）<br>《深入理解Java虚拟机》P59，使用Unsafe分配直接内存，或者使用NIO的问题</p>
-</li>
-<li><p>栈溢出问题<br>-Xss设定太小</p>
-</li>
-<li><p>比较一下这两段程序的异同，分析哪一个是更优的写法：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Object o = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100</span>; i++) &#123;</span><br><span class="line">    o = <span class="keyword">new</span> Object();</span><br><span class="line">    <span class="comment">//业务处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">100</span>; i++) &#123;</span><br><span class="line">    Object o = <span class="keyword">new</span> Object();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>重写finalize引发频繁GC<br>小米云，HBase同步系统，系统通过nginx访问超时报警，最后排查，C++程序员重写finalize引发频繁GC问题<br>为什么C++程序员会重写finalize？（new delete）<br>finalize耗时比较长（200ms）</p>
-</li>
-<li><p>如果有一个系统，内存一直消耗不超过10%，但是观察GC日志，发现FGC总是频繁产生，会是什么引起的？<br>System.gc() (这个比较Low)</p>
-</li>
-<li><p>Distuptor有个可以设置链的长度，如果过大，然后对象大，消费完不主动释放，会溢出 (来自 死物风情)</p>
-</li>
-<li><p>用jvm都会溢出，mycat用崩过，1.6.5某个临时版本解析sql子查询算法有问题，9个exists的联合sql就导致生成几百万的对象（来自 死物风情）</p>
-</li>
-<li><p>new 大量线程，会产生 native thread OOM，（low）应该用线程池，<br>解决方案：减少堆空间（太TMlow了）,预留更多内存产生native thread<br>JVM内存占物理内存比例 50% - 80%</p>
-</li>
-</ol>
-<h3 id="GC常用参数"><a href="#GC常用参数" class="headerlink" title="GC常用参数"></a>GC常用参数</h3><ul>
-<li>-Xmn -Xms -Xmx -Xss<br>年轻代 最小堆 最大堆 栈空间</li>
-<li>-XX:+UseTLAB<br>使用TLAB，默认打开</li>
-<li>-XX:+PrintTLAB<br>打印TLAB的使用情况</li>
-<li>-XX:TLABSize<br>设置TLAB大小</li>
-<li>-XX:+DisableExplictGC<br>System.gc()不管用 ，FGC</li>
-<li>-XX:+PrintGC</li>
-<li>-XX:+PrintGCDetails</li>
-<li>-XX:+PrintHeapAtGC</li>
-<li>-XX:+PrintGCTimeStamps</li>
-<li>-XX:+PrintGCApplicationConcurrentTime (低)<br>打印应用程序时间</li>
-<li>-XX:+PrintGCApplicationStoppedTime （低）<br>打印暂停时长</li>
-<li>-XX:+PrintReferenceGC （重要性低）<br>记录回收了多少种不同引用类型的引用</li>
-<li>-verbose:class<br>类加载详细过程</li>
-<li>-XX:+PrintVMOptions</li>
-<li>-XX:+PrintFlagsFinal  -XX:+PrintFlagsInitial<br>必须会用</li>
-<li>-Xloggc:opt/log/gc.log</li>
-<li>-XX:MaxTenuringThreshold<br>升代年龄，最大值15</li>
-<li>锁自旋次数 -XX:PreBlockSpin 热点代码检测参数-XX:CompileThreshold 逃逸分析 标量替换 …<br>这些不建议设置</li>
-</ul>
-<h3 id="Parallel常用参数"><a href="#Parallel常用参数" class="headerlink" title="Parallel常用参数"></a>Parallel常用参数</h3><ul>
-<li>-XX:SurvivorRatio</li>
-<li>-XX:PreTenureSizeThreshold<br>大对象到底多大</li>
-<li>-XX:MaxTenuringThreshold</li>
-<li>-XX:+ParallelGCThreads<br>并行收集器的线程数，同样适用于CMS，一般设为和CPU核数相同</li>
-<li>-XX:+UseAdaptiveSizePolicy<br>自动选择各区大小比例</li>
-</ul>
-<h3 id="CMS常用参数"><a href="#CMS常用参数" class="headerlink" title="CMS常用参数"></a>CMS常用参数</h3><ul>
-<li>-XX:+UseConcMarkSweepGC</li>
-<li>-XX:ParallelCMSThreads<br>CMS线程数量</li>
-<li>-XX:CMSInitiatingOccupancyFraction<br>使用多少比例的老年代后开始CMS收集，默认是68%(近似值)，如果频繁发生SerialOld卡顿，应该调小，（频繁CMS回收）</li>
-<li>-XX:+UseCMSCompactAtFullCollection<br>在FGC时进行压缩</li>
-<li>-XX:CMSFullGCsBeforeCompaction<br>多少次FGC之后进行压缩</li>
-<li>-XX:+CMSClassUnloadingEnabled</li>
-<li>-XX:CMSInitiatingPermOccupancyFraction<br>达到什么比例时进行Perm回收</li>
-<li>GCTimeRatio<br>设置GC时间占用程序运行时间的百分比</li>
-<li>-XX:MaxGCPauseMillis<br>停顿时间，是一个建议时间，GC会尝试用各种手段达到这个时间，比如减小年轻代</li>
-</ul>
-<h3 id="G1常用参数"><a href="#G1常用参数" class="headerlink" title="G1常用参数"></a>G1常用参数</h3><ul>
-<li>-XX:+UseG1GC</li>
-<li>-XX:MaxGCPauseMillis<br>建议值，G1会尝试调整Young区的块数来达到这个值</li>
-<li>-XX:GCPauseIntervalMillis<br>？GC的间隔时间</li>
-<li>-XX:+G1HeapRegionSize<br>分区大小，建议逐渐增大该值，1 2 4 8 16 32。<br>随着size增加，垃圾的存活时间更长，GC间隔更长，但每次GC的时间也会更长<br>ZGC做了改进（动态区块大小）</li>
-<li>G1NewSizePercent<br>新生代最小比例，默认为5%</li>
-<li>G1MaxNewSizePercent<br>新生代最大比例，默认为60%</li>
-<li>GCTimeRatio<br>GC时间建议比例，G1会根据这个值调整堆空间</li>
-<li>ConcGCThreads<br>线程数量</li>
-<li>InitiatingHeapOccupancyPercent<br>启动G1的堆空间占用比例</li>
-</ul>
-<h4 id="作业"><a href="#作业" class="headerlink" title="作业"></a>作业</h4><ol>
-<li><p>-XX:MaxTenuringThreshold控制的是什么？<br>A: 对象升入老年代的年龄</p>
-<pre><code>B: 老年代触发FGC时的内存垃圾比例</code></pre></li>
-<li><p>生产环境中，倾向于将最大堆内存和最小堆内存设置为：（为什么？）<br>A: 相同 B：不同</p>
-</li>
-<li><p>JDK1.8默认的垃圾回收器是：<br>A: ParNew + CMS</p>
-<pre><code>B: G1
-C: PS + ParallelOld
-D: 以上都不是</code></pre></li>
-<li><p>什么是响应时间优先？</p>
-</li>
-<li><p>什么是吞吐量优先？</p>
-</li>
-<li><p>ParNew和PS的区别是什么？</p>
-</li>
-<li><p>ParNew和ParallelOld的区别是什么？（年代不同，算法不同）</p>
-</li>
-<li><p>长时间计算的场景应该选择：A：停顿时间 B: 吞吐量</p>
-</li>
-<li><p>大规模电商网站应该选择：A：停顿时间 B: 吞吐量</p>
-</li>
-<li><p>HotSpot的垃圾收集器最常用有哪些？</p>
-</li>
-<li><p>常见的HotSpot垃圾收集器组合有哪些？</p>
-</li>
-<li><p>JDK1.7 1.8 1.9的默认垃圾回收器是什么？如何查看？</p>
-</li>
-<li><p>所谓调优，到底是在调什么？</p>
-</li>
-<li><p>如果采用PS + ParrallelOld组合，怎么做才能让系统基本不产生FGC</p>
-</li>
-<li><p>如果采用ParNew + CMS组合，怎样做才能够让系统基本不产生FGC</p>
-<p> 1.加大JVM内存</p>
-<p> 2.加大Young的比例</p>
-<p> 3.提高Y-O的年龄</p>
-<p> 4.提高S区比例</p>
-<p> 5.避免代码内存泄漏</p>
-</li>
-<li><p>G1是否分代？G1垃圾回收器会产生FGC吗？</p>
-</li>
-<li><p>如果G1产生FGC，你应该做什么？</p>
-<ol>
-<li>扩内存</li>
-<li>提高CPU性能（回收的快，业务逻辑产生对象的速度固定，垃圾回收越快，内存空间越大）</li>
-<li>降低MixedGC触发的阈值，让MixedGC提早发生（默认是45%）</li>
-</ol>
-<ol start="18">
-<li><p>问：生产环境中能够随随便便的dump吗？<br>小堆影响不大，大堆会有服务暂停或卡顿（加live可以缓解），dump前会有FGC</p>
-</li>
-<li><p>问：常见的OOM问题有哪些？<br>栈 堆 MethodArea 直接内存</p>
-</li>
-</ol>
-</li>
-</ol>
-<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
-<li><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">https://blogs.oracle.com/</a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">jonthecollector</a><a href="https://blogs.oracle.com/jonthecollector/our-collectors" target="_blank" rel="noopener">/our-collectors</a></li>
-<li><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></li>
-<li><a href="http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp" target="_blank" rel="noopener">http://java.sun.com/javase/technologies/hotspot/vmoptions.jsp</a></li>
-<li>JVM调优参考文档：<a href="https://docs.oracle.com/en/java/javase/13/gctuning/introduction-garbage-collection-tuning.html#GUID-8A443184-7E07-4B71-9777-4F12947C8184" target="_blank" rel="noopener">https://docs.oracle.com/en/java/javase/13/gctuning/introduction-garbage-collection-tuning.html#GUID-8A443184-7E07-4B71-9777-4F12947C8184</a> </li>
-<li><a href="https://www.cnblogs.com/nxlhero/p/11660854.html" target="_blank" rel="noopener">https://www.cnblogs.com/nxlhero/p/11660854.html</a> 在线排查工具</li>
-<li><a href="https://www.jianshu.com/p/507f7e0cc3a3" target="_blank" rel="noopener">https://www.jianshu.com/p/507f7e0cc3a3</a> arthas常用命令</li>
-<li>Arthas手册：<ol>
-<li>启动arthas java -jar arthas-boot.jar</li>
-<li>绑定java进程</li>
-<li>dashboard命令观察系统整体情况</li>
-<li>help 查看帮助</li>
-<li>help xx 查看具体命令帮助</li>
-</ol>
-</li>
-<li>jmap命令参考： <a href="https://www.jianshu.com/p/507f7e0cc3a3" target="_blank" rel="noopener">https://www.jianshu.com/p/507f7e0cc3a3</a> <ol>
-<li>jmap -heap pid</li>
-<li>jmap -histo pid</li>
-<li>jmap -clstats pid</li>
-</ol>
-</li>
-</ol>
-
+<h4 id="2-如何定位垃圾"><a href="#2-如何定位垃圾" class="headerlink" title="2.如何定位垃圾"></a>2.如何定位垃圾</h4>
+    
+    <a class="article-more-a" href="/2020/03/26/GC and Tuning_1/#more">more >></a>
+    
     
 
     
@@ -901,19 +385,9 @@ D: 以上都不是</code></pre></li>
 <h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>目标停顿时间10ms MaxPauseGCMillis = 10ms</p>
 <p>跟内存多大无关</p>
 <h3 id="NUMA"><a href="#NUMA" class="headerlink" title="NUMA"></a>NUMA</h3><p>知道NUMA存在并且能利用，哪个CPU要分配对象，优先分配离得近的内存</p>
-<h3 id="目前不分代（将来可能分冷热对象）"><a href="#目前不分代（将来可能分冷热对象）" class="headerlink" title="目前不分代（将来可能分冷热对象）"></a>目前不分代（将来可能分冷热对象）</h3><p>ZGC -&gt; Asul C4 </p>
-<h3 id="颜色指针"><a href="#颜色指针" class="headerlink" title="颜色指针"></a>颜色指针</h3><p>原来的GC信息记录在哪里呢？ 对象头部</p>
-<p>ZGC记录在指针，跟对象无关，因此可以immediate memory reuse</p>
-<p>低42位指向对象，2 ^ 42 = 4T jdk13 2 ^44 = 16T</p>
-<p>后面四位代表对象不同状态 m0 m1 remapped finalizable</p>
-<p>18为unused</p>
-<p>目前最大16T</p>
-<p>内存中有个地址：地址中装了01001000 , mov  72，到底是一个立即数，还是一条指令？</p>
-<p>CPU - &gt; 内存，通过总线连接， - &gt; 数据总线 地址总线 控制总线</p>
-<p>目前的主板地址总线最宽48bit，</p>
-<p>读一个对象的时候，会加上load barrier，</p>
-<p>探测是不是bad color  , mark / relocate / remap ， 等完成拿到新地址，再返回</p>
-
+    
+    <a class="article-more-a" href="/2020/03/26/gc ZGC_3/#more">more >></a>
+    
     
 
     
@@ -965,68 +439,9 @@ D: 以上都不是</code></pre></li>
     
     <h3 id="初识-RocketMQ"><a href="#初识-RocketMQ" class="headerlink" title="初识 RocketMQ"></a>初识 RocketMQ</h3><hr>
 <p>RocketMQ是一款分布式、队列模型的消息中间件，由阿里巴巴自主研发的一款适用于高并发、高可靠性、海量数据场景的消息中间件。早期开源2.x版本名为MetaQ；15年迭代3.x版本，更名为RocketMQ，16年开始贡献到Apache，经过1年多的孵化，最终成为Apache顶级的开源项目，更新非常频繁，社区活跃度也非常高；目前最新版本为4.5.1-release版本（2019-7-20日前）。RocketMQ参考借鉴了优秀的开源消息中间件Apache Kafka（这也是我们后面课程中重点要讲解的内容哦），其消息的路由、存储、集群划分都借鉴了Kafka优秀的设计思路，并结合自身的 “双十一” 场景进行了合理的扩展和API丰富。</p>
-<h3 id="优秀的能力与支持"><a href="#优秀的能力与支持" class="headerlink" title="优秀的能力与支持"></a>优秀的能力与支持</h3><hr>
-<p>接下来我们一起来看一下RocketMQ优秀的能力吧 ~</p>
-<ul>
-<li>支持集群模型、负载均衡、水平扩展能力</li>
-<li>亿级别的消息堆积能力</li>
-<li>采用零拷贝的原理、顺序写盘、随机读（索引文件）</li>
-<li>丰富的API使用</li>
-<li>代码优秀，底层通信框架采用Netty NIO框架</li>
-<li>NameServer 代替 Zookeeper</li>
-<li>强调集群无单点，可扩展，任意一点高可用，水平可扩展</li>
-<li>消息失败重试机制、消息可查询</li>
-<li>开源社区活跃度、是否足够成熟（经过双十一考验）</li>
-</ul>
-<h3 id="专业术语"><a href="#专业术语" class="headerlink" title="专业术语"></a>专业术语</h3><hr>
-<p>任何一种技术框架，都有 “她” 的专有名词，在你刚开始接触 “她” 的时候，一定要了解 “她” 的专业术语，这样能够更快速、更高效的和 “她” 愉快的玩耍…</p>
-<ul>
-<li>Producer：消息生产者，负责产生消息，一般由业务系统负责产生消息。</li>
-<li>Consumer：消息消费者，负责消费消息，一般是后台系统负责异步消费。</li>
-<li>Push Consumer：Consumer的一种，需要向Consumer对象注册监听。</li>
-<li>Pull Consumer：Consumer的一种，需要主动请求Broker拉取消息。</li>
-<li>Producer Group：生产者集合，一般用于发送一类消息。</li>
-<li>Consumer Group：消费者集合，一般用于接受一类消息进行消费。</li>
-<li>Broker ： MQ消息服务（中转角色，用于消息存储与生产消费转发）。</li>
-</ul>
-<h3 id="RocketMQ核心源码包及功能说明"><a href="#RocketMQ核心源码包及功能说明" class="headerlink" title="RocketMQ核心源码包及功能说明"></a>RocketMQ核心源码包及功能说明</h3><hr>
-<p>如下图所示，我们要带小伙伴们一起来看看RocketMQ源码包的组成，这样更方便我们日后对他有一个深入的学习。<br><img src="https://climg.mukewang.com/5df8401d0919472f03410264.png" alt="图片描述"><br><img src="https://climg.mukewang.com/5df8404409bd481303400274.png" alt="图片描述"></p>
-<ul>
-<li>rocketmq-broker 主要的业务逻辑，消息收发，主从同步, pagecache</li>
-<li>rocketmq-client 客户端接口，比如生产者和消费者</li>
-<li>rocketmq-common 公用数据结构等等</li>
-<li>rocketmq-distribution 编译模块，编译输出等</li>
-<li>rocketmq-example 示例，比如生产者和消费者</li>
-<li>rocketmq-fliter 进行Broker过滤的不感兴趣的消息传输，减小带宽压力</li>
-<li>rocketmq-logappender、rocketmq-logging日志相关</li>
-<li>rocketmq-namesrv Namesrv服务，用于服务协调</li>
-<li>rocketmq-openmessaging 对外提供服务</li>
-<li>rocketmq-remoting 远程调用接口，封装Netty底层通信</li>
-<li>rocketmq-srvutil 提供一些公用的工具方法，比如解析命令行参数</li>
-<li>rocketmq-store 消息存储核心包</li>
-<li>rocketmq-test 提供一些测试代码包</li>
-<li>rocketmq-tools 管理工具，比如有名的mqadmin工具</li>
-</ul>
-<h3 id="集群架构模型"><a href="#集群架构模型" class="headerlink" title="集群架构模型"></a>集群架构模型</h3><hr>
-<p>RocketMQ为我们提供了丰富的集群架构模型，包括单点模式、主从模式、双主模式、以及生产上使用最多的双主双从模式（或者说多主多从模式），在这里我们仅介绍一下经典的双主双从集群模型，如下图所示：<br><img src="https://climg.mukewang.com/5df8407b0950a18b08540381.png" alt="图片描述"></p>
-<ul>
-<li>Producer集群就是生产者集群（他们在同一个生产者组 Producer Group）</li>
-<li>Consumer集群就是消费者集群（他们在同一个消费者组 Consumer Group）</li>
-<li>NameServer集群作为超轻量级的配置中心，只做集群元数据存储和心跳工作，不必保障节点间数据强一致性，也就是说NameServer集群是一个多机热备的概念。</li>
-<li>对于Broker而言，通常Master与Slave为一组服务，他们互为主从节点，通过NameServer与外部的Client端暴露统一的集群入口。Broker就是消息存储的核心MQ服务了。</li>
-</ul>
-<h3 id="集群架构思考"><a href="#集群架构思考" class="headerlink" title="集群架构思考"></a>集群架构思考</h3><hr>
-<p>RocketMQ作为国内顶级的消息中间件，其性能主要依赖于天然的分布式Topic/Queue，并且其内存与磁盘都会存储消息数据，借鉴了Kafka的 “空中接力” 概念（这个我们后面学习Kafka的时候会详细的说明），所谓 “空中接力” 就是指数据不一定要落地，RocketMQ提供了同步/异步双写、同步/异步复制的特性。在真正的生产环境中应该选择符合自己业务的配置。下面针对于RocketMQ的高性能及其瓶颈在这里加以说明：</p>
-<ul>
-<li>架构思考：<ul>
-<li>RocketMQ目前本人在公司内部实际生产环境采用8M-8S的集群架构（8主8从）硬件单点Master为32C，96G内存，500G的SSD</li>
-<li>其主要瓶颈最终会落在IOPS上面，当高峰期来临的时候，磁盘读写能力是主要的性能瓶颈，每秒收发消息IOPS达到10W+ 消息，这也是公司内部主要的可靠性消息中间件</li>
-<li>在很多时候，我们的业务会有一些非核心的消息投递，后续会进行消息中间件的业务拆分，把不重要的消息（可以允许消息丢失、非可靠性投递的消息）采用Kafka的异步发送机制，借助Kafka强大的吞吐量和消息堆积能力来做业务的分流（当然RocketMQ的性能也足够好）。</li>
-<li>为什么瓶颈在IOPS? 根本原因还是因为云环境导致的问题，云环境的SSD物理存储显然和自建机房SSD会有不小的差距，这一点我们无论是从数据库的磁盘性能、还是搜索服务（ElasticSearch）的磁盘性能，都能给出准确的瓶颈点，单机IOPS达到1万左右就是云存储SSD的性能瓶颈，这个也解释了 “木桶短板原理” 的效应，在真正的生产中，CPU的工作主要在等待IO操作，高并发下 CPU资源接近极限，但是IOPS还是达不到我们想要的效果。</li>
-</ul>
-</li>
-</ul>
-
+    
+    <a class="article-more-a" href="/2020/03/25/RocketMQ/#more">more >></a>
+    
     
 
     
@@ -1079,85 +494,9 @@ D: 以上都不是</code></pre></li>
     <p>#ActiveMQ消息中间件集群架构与原理解析</p>
 <h3 id="初识-JMS-与其专业术语"><a href="#初识-JMS-与其专业术语" class="headerlink" title="初识 JMS 与其专业术语"></a>初识 JMS 与其专业术语</h3><hr>
 <p>小伙伴们大家好，现在我们和大家一起了解一下古老而又神秘的消息中间件”ActiveMQ”。首先，说起ActiveMQ，就必须先聊聊JMS（Java Message Service）规范，也就是Java消息服务，它定义了Java中访问消息中间件的接口的规范。在这里注意哦，JMS只是接口，并没有给予实现，实现JMS接口的消息中间件称为 “JMS Provider”，目前知名的开源 MOM （Message Oriented Middleware，也就是消息中间件）系统包括Apache的ActiveMQ、RocketMQ、Kafka，以及RabbitMQ，可以说他们都 “基本遵循” 或 “参考” JMS规范，都有自己的特点和优势。</p>
-<ul>
-<li>专业术语<ul>
-<li>JMS（Java Message Service）：实现JMS 接口的消息中间件；</li>
-<li>Provider（MessageProvider）：消息的生产者；</li>
-<li>Consumer（MessageConsumer）：消息的消费者；</li>
-<li>PTP（Point to Point）：即点对点的消息模型，这也是非常经典的模型；</li>
-<li>Pub / Sub（Publish/Subscribe）：，即发布/订阅的消息模型；</li>
-<li>Queue：队列目标，也就是我们常说的消息队列，一般都是会真正的进行物理存储；</li>
-<li>Topic：主题目标；</li>
-<li>ConnectionFactory：连接工厂，JMS 用它创建连接；</li>
-<li>Connection：JMS 客户端到JMS Provider 的连接；</li>
-<li>Destination：消息的目的地；</li>
-<li>Session：会话，一个发送或接收消息的线程（这里Session可以类比Mybatis的Session）；</li>
-</ul>
-</li>
-<li>JMS 消息格式定义：<ul>
-<li>StreamMessage 原始值的数据流</li>
-<li>MapMessage 一套名称/值对</li>
-<li>TextMessage 一个字符串对象</li>
-<li>BytesMessage 一个未解释字节的数据流</li>
-<li>ObjectMessage 一个序列化的Java对象</li>
-</ul>
-</li>
-</ul>
-<h3 id="了解ActiveMQ"><a href="#了解ActiveMQ" class="headerlink" title="了解ActiveMQ"></a>了解ActiveMQ</h3><hr>
-<p>ActiveMQ 是一个完全支持JMS1.1和J2EE 1.4规范的 JMS Provider实现，尽管JMS规范出台已经是很久的事情了，但是JMS在早些年的 “J2EE应用” 时期扮演着特殊的地位，可以说那个年代ActiveMQ在业界应用最广泛，当然如果现在想要有更强大的性能和海量数据处理能力，ActiveMQ还需要不断的升级版本，不断的提升性能和架构设计的重构。</p>
-<p>就算现在我们 80% 以上的业务我们使用ActiveMQ已经足够满足需求，其丰富的API、多种集群构建模式使得他成为业界老牌消息中间件，在中小型企业中应用广泛！</p>
-<p>当然如果你想针对大规模、高并发应用服务做消息中间件技术选型，譬如淘宝、京东这种大型的电商网站，尤其是双11这种特殊时间，ActiveMQ可能就显得力不从心了，当然我们这里后续还会和大家介绍其他非常优秀的MOM咯。</p>
-<h3 id="消息投递模式"><a href="#消息投递模式" class="headerlink" title="消息投递模式"></a>消息投递模式</h3><hr>
-<p>废话不多说，我们首先要了解JMS规范里最经典的两种消息投递模式，即 “点对点” 与 “发布订阅”。</p>
-<ul>
-<li>点对点：生产者向队列投递一条消息，只有一个消费者能够监听得到这条消息（PTP)，下图所示：<br><img src="https://climg.mukewang.com/5df83dcf08d7ded106650409.jpg" alt="图片描述"></li>
-<li>发布订阅：生产者向队列投递一条消息，所有监听该队列的消费者都能够监听得到这条消息（P/S)，下图所示：<br><img src="https://climg.mukewang.com/5df83de108523a3005910364.jpg" alt="图片描述"></li>
-</ul>
-<h3 id="ActiveMQ各项指标"><a href="#ActiveMQ各项指标" class="headerlink" title="ActiveMQ各项指标"></a>ActiveMQ各项指标</h3><hr>
-<p>衡量一个MOM，我们主要从三方面考虑即可，即服务性能、存储堆积能力、可扩展性。</p>
-<ul>
-<li>服务性能<ul>
-<li>ActiveMQ的性能一般，在早期传统行业为王的时代还是比较流行的，但现如今面对高并发、大数据的业务场景，往往力不从心！</li>
-</ul>
-</li>
-<li>数据存储<ul>
-<li>默认采用kahadb存储（索引文件形式存储），也可以使用高性能的google leveldb（内存数据库存储）， 或者可以使用MySql、Oracle进程消息存储（关系型数据库存储）。</li>
-</ul>
-</li>
-<li>集群架构<ul>
-<li>ActiveMQ 可以与zookeeper进行构建 主备集群模型，并且多套的主备模型直接可以采用Network的方式构建分布式集群。</li>
-</ul>
-</li>
-</ul>
-<h3 id="ActiveMQ集群架构模式"><a href="#ActiveMQ集群架构模式" class="headerlink" title="ActiveMQ集群架构模式"></a>ActiveMQ集群架构模式</h3><hr>
-<p>ActiveMQ最经典的两种集群架构模式，Master-Slave 、Network 集群模式！</p>
-<ul>
-<li><p>Master-Slave：<br><img src="https://climg.mukewang.com/5df83e0008f50bb003560292.jpg" alt="图片描述"></p>
-</li>
-<li><p>Master-Slave：顾名思义，就是主从方式，当然这里要理解为主备的方式，也就是双机热备机制；Master Slave 背后的想法是，消息被复制到slave broker，因此即使master broker遇到了像硬件故障之类的错误，你也可以立即切换到slave broker而不丢失任何消息。 Master Slave是目前ActiveMQ推荐的高可靠性和容错的解决方案。</p>
-</li>
-<li><p>架构思考：Master-Slave集群模型的关键点：</p>
-<ul>
-<li>上图（Master-Slave）绿色的为主节点，灰色的则为备份节点，这两个节点都是运行状态的。</li>
-<li>zookeeper的作用就是为了当绿色的主节点宕机时，进行及时切换到备份的灰色节点上去，使其进行主从角色的互换，用于实现高可用性的方案。</li>
-<li>Master-Slave集群模型的缺点也显而易见，就是不能做到分布式的topic、queue，当消息量巨大时，我们的MQ集群压力过大，没办法满足分布式的需求。</li>
-</ul>
-</li>
-<li><p>Network：<br><img src="https://climg.mukewang.com/5df83e1d083eb06b05170309.jpg" alt="图片描述"></p>
-</li>
-<li><p>Network：这里可以理解为网络通信方式，也可以说叫Network of brokers。这种方式真正解决了分布式消息存储和故障转移、broker切换的问题。可以理解消息会进行均衡；从ActiveMQ1.1版本起，ActiveMQ支持networks of brokers。它支持分布式的queues和topics。一个broker会相同对待所有的订阅（subscription）：不管他们是来自本地的客户连接，还是来自远程broker，它都会递送有关的消息拷贝到每个订阅。远程broker得到这个消息拷贝后，会依次把它递送到其内部的本地连接上。</p>
-</li>
-<li><p>架构思考：Network集群模型的关键点：</p>
-<ul>
-<li><p>首先，这种方案需要两套或多套（Master-Slave）的集群模型才可以搞定，部署非常麻烦，需要两套或多套集群直接相互交叉配置，相互间能够感知到彼此的存在。下面我给出一段XML配置，简单来说就是在ActiveMQ的配置文件里要进行多套（Master-Slave）之间的 networkConnector配置工作：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">broker</span> <span class="attr">brokerName</span>=<span class="string">"receiver"</span> <span class="attr">persistent</span>=<span class="string">"false"</span> <span class="attr">useJmx</span>=<span class="string">"false"</span>&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;<span class="name">transportConnectors</span>&gt;</span></span><br><span class="line"> 		<span class="tag">&lt;<span class="name">transportConnector</span> <span class="attr">uri</span>=<span class="string">"tcp://localhost:62002"</span>/&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;/<span class="name">transportConnectors</span>&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;<span class="name">networkConnectors</span>&gt;</span></span><br><span class="line">    	<span class="tag">&lt;<span class="name">networkConnector</span> </span></span><br><span class="line"><span class="tag">              <span class="attr">uri</span>=<span class="string">"static:( tcp://localhost:61616,tcp://remotehost:61616)"</span>/&gt;</span></span><br><span class="line"> 	<span class="tag">&lt;/<span class="name">networkConnectors</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">broker</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>其次，Network虽然解决了分布式消息队列这个难题，但是还有很多潜在的问题，最典型的就是资源浪费问题，并且也可能达不到所预期的效果；通常采用Master-Slave模型是传统型互联网公司的首选，作为互联网公司往往会选择开箱即用的消息中间件，从运维、部署、使用各个方面都要优于ActiveMQ，当然ActiveMQ毕竟是 “老牌传统强Q”，Apache的顶级项目之一，目前正在进行新版本的重构（对于5.X版本）与落地，下一代 “Artemis代理”，也可以理解为 “6.X”；有兴趣的小伙伴可以关注一下官网，传送门如下：<a href="https://activemq.apache.org/" target="_blank" rel="noopener">https://activemq.apache.org/</a></p>
-</li>
-</ul>
-</li>
-</ul>
-
+    
+    <a class="article-more-a" href="/2020/03/25/Active MQ原理/#more">more >></a>
+    
     
 
     
@@ -1210,35 +549,9 @@ D: 以上都不是</code></pre></li>
     <p> kafka急速入门与核心API解析</p>
 <h3 id="kafka环境安装"><a href="#kafka环境安装" class="headerlink" title="kafka环境安装"></a>kafka环境安装</h3><hr>
 <p>上面我们已经对kafka的基本概念、核心思想有了一定的了解和认知，并且掌握了kafka在实际工作中的一些主要的应用场景。那么接下来，我们就一起快速进入kafka的安装吧。</p>
-<ul>
-<li><p>kafka下载地址：<a href="http://kafka.apache.org/downloads.html" target="_blank" rel="noopener">http://kafka.apache.org/downloads.html</a></p>
-</li>
-<li><p>kafka安装步骤：首先kafka安装需要依赖与zookeeper，所以小伙伴们先准备好zookeeper环境（三个节点即可），然后我们来一起构建kafka broker。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># 解压命令：</span><br><span class="line">tar -zxvf kafka_2.12-2.1.0.tgz -C /usr/local/</span><br><span class="line"><span class="meta">#</span># 改名命令：</span><br><span class="line">mv kafka_2.12-2.1.0/ kafka_2.12</span><br><span class="line"><span class="meta">#</span># 进入解压后的目录，修改server.properties文件：</span><br><span class="line">vim /usr/local/kafka_2.12/config/server.properties</span><br><span class="line"><span class="meta">#</span># 修改配置：</span><br><span class="line">broker.id=0</span><br><span class="line">port=9092</span><br><span class="line">host.name=192.168.11.51</span><br><span class="line">advertised.host.name=192.168.11.51</span><br><span class="line">log.dirs=/usr/local/kafka_2.12/kafka-logs</span><br><span class="line">num.partitions=2</span><br><span class="line">zookeeper.connect=192.168.11.111:2181,192.168.11.112:2181,192.168.11.113:2181</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span># 建立日志文件夹：</span><br><span class="line">mkdir /usr/local/kafka_2.12/kafka-logs</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>#启动kafka：</span><br><span class="line">/usr/local/kafka_2.12/bin/kafka-server-start.sh /usr/local/kafka_2.12/config/server.properties &amp;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h3 id="kafka常用命令"><a href="#kafka常用命令" class="headerlink" title="kafka常用命令"></a>kafka常用命令</h3><hr>
-<p>我们接下来一起了解几个非常重要的命令，通过这些命令我们对kafka topic partition 进行查看和操作。</p>
-<ul>
-<li><p>常用命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span># 简单操作：</span><br><span class="line"><span class="meta">#</span>（1）创建topic主题命令：（创建名为test的topic， 1个分区分别存放数据，数据备份总共1份）</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --create --topic topic1 --partitions 1  --replication-factor 1  </span><br><span class="line"><span class="meta">#</span># --zookeeper 为zk服务列表</span><br><span class="line"><span class="meta">#</span># --create 命令后 --topic 为创建topic 并指定 topic name</span><br><span class="line"><span class="meta">#</span># --partitions 为指定分区数量</span><br><span class="line"><span class="meta">#</span># --replication-factor 为指定副本集数量</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（2）查看topic列表命令：</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --list</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（3）kafka命令发送数据：（然后我们就可以编写数据发送出去了）</span><br><span class="line">kafka-console-producer.sh --broker-list 192.168.11.51:9092 --topic topic1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（4）kafka命令接受数据：（然后我们就可以看到消费的信息了）</span><br><span class="line">kafka-console-consumer.sh --bootstrap-server 192.168.11.51:9092 --topic topic1 --from-beginning</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（5）删除topic命令：</span><br><span class="line">kafka-topics.sh --zookeeper 192.168.11.111:2181 --delete --topic topic1</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span>（6）kafka查看消费进度：（当我们需要查看一个消费者组的消费进度时，则使用下面的命令）</span><br><span class="line">kafka-consumer-groups.sh --bootstrap-server 192.168.11.51:9092 --describe --group group1</span><br><span class="line"><span class="meta">#</span># --describe --group 为订阅组， 后面指定 group name</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-<h3 id="急速入门"><a href="#急速入门" class="headerlink" title="急速入门"></a>急速入门</h3><hr>
-<p>下面我们一起使用kafka最基本的API来对kafka进行操作！</p>
-<ul>
-<li><p>kafka依赖包：</p>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.apache.kafka<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kafka_2.12<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>kafka生产者：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.bfxy.mix.kafka;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.Callback;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.KafkaProducer;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.ProducerRecord;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.producer.RecordMetadata;</span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectKafkaProducer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个kafka生产者</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> KafkaProducer&lt;String, String&gt; producer;</span><br><span class="line">	<span class="comment">// 定义一个成员变量为topic</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line">    </span><br><span class="line">     <span class="comment">// 初始化kafka的配置文件和实例：Properties &amp; KafkaProducer</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CollectKafkaProducer</span><span class="params">(String topic)</span> </span>&#123; </span><br><span class="line">		Properties props = <span class="keyword">new</span> Properties(); </span><br><span class="line">         <span class="comment">// 配置broker地址</span></span><br><span class="line">		props.put(<span class="string">"bootstrap.servers"</span>, <span class="string">"192.168.11.51:9092"</span>); </span><br><span class="line">         <span class="comment">// 定义一个 client.id</span></span><br><span class="line">		props.put(<span class="string">"client.id"</span>, <span class="string">"demo-producer-test"</span>); </span><br><span class="line">		</span><br><span class="line">         <span class="comment">// 其他配置项：</span></span><br><span class="line">        </span><br><span class="line"><span class="comment">//		props.put("batch.size", 16384);			//16KB -&gt; 满足16KB发送批量消息</span></span><br><span class="line"><span class="comment">//		props.put("linger.ms", 10); 			//10ms -&gt; 满足10ms时间间隔发送批量消息</span></span><br><span class="line"><span class="comment">//		props.put("buffer.memory", 33554432);	 //32M -&gt; 缓存提性能</span></span><br><span class="line">		</span><br><span class="line">         <span class="comment">// kafka 序列化配置：</span></span><br><span class="line">		props.put(<span class="string">"key.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>); </span><br><span class="line">		props.put(<span class="string">"value.serializer"</span>, <span class="string">"org.apache.kafka.common.serialization.StringSerializer"</span>); </span><br><span class="line">         </span><br><span class="line">         <span class="comment">// 创建 KafkaProducer 与 接收 topic</span></span><br><span class="line">		<span class="keyword">this</span>.producer = <span class="keyword">new</span> KafkaProducer&lt;&gt;(props);</span><br><span class="line">		<span class="keyword">this</span>.topic = topic; </span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发送消息 （同步或者异步）</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(Object message, <span class="keyword">boolean</span> syncSend)</span> <span class="keyword">throws</span> InterruptedException </span>&#123; </span><br><span class="line">		<span class="keyword">try</span> &#123; </span><br><span class="line">             <span class="comment">// 同步发送</span></span><br><span class="line">			<span class="keyword">if</span>(syncSend) &#123;</span><br><span class="line">				producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, JSON.toJSONString(message)));		</span><br><span class="line">			&#125; </span><br><span class="line">             <span class="comment">// 异步发送（callback实现回调监听）</span></span><br><span class="line">             <span class="keyword">else</span> &#123;</span><br><span class="line">				producer.send(<span class="keyword">new</span> ProducerRecord&lt;&gt;(topic, </span><br><span class="line">                              JSON.toJSONString(message)), </span><br><span class="line">                              <span class="keyword">new</span> Callback() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCompletion</span><span class="params">(RecordMetadata recordMetadata, Exception e)</span> </span>&#123;</span><br><span class="line">	                    <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">	                        System.err.println(<span class="string">"Unable to write to Kafka in CollectKafkaProducer ["</span> + topic + <span class="string">"] exception: "</span> + e);</span><br><span class="line">	                    &#125;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);				</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			e.printStackTrace(); </span><br><span class="line">		&#125; </span><br><span class="line">	&#125; </span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 关闭producer</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		producer.close();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试函数</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">		String topic = <span class="string">"topic1"</span>;</span><br><span class="line">		CollectKafkaProducer collectKafkaProducer = <span class="keyword">new</span> CollectKafkaProducer(topic);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span> ; i &lt; <span class="number">10</span>; i ++) &#123;</span><br><span class="line">			User user = <span class="keyword">new</span> User();</span><br><span class="line">			user.setId(i+<span class="string">""</span>);</span><br><span class="line">			user.setName(<span class="string">"张三"</span>);</span><br><span class="line">			collectKafkaProducer.send(user, <span class="keyword">true</span>);</span><br><span class="line">		&#125;</span><br><span class="line">        </span><br><span class="line">		Thread.sleep(Integer.MAX_VALUE);</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>kafka消费者：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.bfxy.mix.kafka;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Properties;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerConfig;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRebalanceListener;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecord;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.ConsumerRecords;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.KafkaConsumer;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.clients.consumer.OffsetAndMetadata;</span><br><span class="line"><span class="keyword">import</span> org.apache.kafka.common.TopicPartition;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> kafka.consumer.Consumer;</span><br><span class="line"><span class="keyword">import</span> lombok.extern.slf4j.Slf4j;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectKafkaConsumer</span> </span>&#123;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 定义消费者实例</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> KafkaConsumer&lt;String, String&gt; consumer;</span><br><span class="line">	<span class="comment">// 定义消费主题</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> String topic;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     <span class="comment">// 消费者初始化</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">CollectKafkaConsumer</span><span class="params">(String topic)</span> </span>&#123; </span><br><span class="line">		Properties props = <span class="keyword">new</span> Properties();</span><br><span class="line">         <span class="comment">// 消费者的zookeeper 地址配置</span></span><br><span class="line">		props.put(<span class="string">"zookeeper.connect"</span>, <span class="string">"192.168.11.111:2181"</span>); </span><br><span class="line">         <span class="comment">// 消费者的broker 地址配置</span></span><br><span class="line">		props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, <span class="string">"192.168.11.51:9092"</span>);</span><br><span class="line">		<span class="comment">// 消费者组定义</span></span><br><span class="line">         props.put(ConsumerConfig.GROUP_ID_CONFIG, <span class="string">"demo-group-id"</span>); </span><br><span class="line">         <span class="comment">// 是否自动提交（auto commit，一般生产环境均设置为false，则为手工确认）</span></span><br><span class="line">		props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, <span class="string">"false"</span>);</span><br><span class="line">         <span class="comment">// 自动提交配置项</span></span><br><span class="line"><span class="comment">//		props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");</span></span><br><span class="line">         <span class="comment">// 消费进度（位置 offset）重要设置: latest,earliest </span></span><br><span class="line">		props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, <span class="string">"earliest"</span>);</span><br><span class="line">         <span class="comment">// 超时时间配置</span></span><br><span class="line">		props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, <span class="string">"30000"</span>); </span><br><span class="line">		<span class="comment">// kafka序列化配置</span></span><br><span class="line">        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>); </span><br><span class="line">		props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, <span class="string">"org.apache.kafka.common.serialization.StringDeserializer"</span>); </span><br><span class="line">        </span><br><span class="line">         <span class="comment">// 创建consumer对象 &amp; 赋值topic</span></span><br><span class="line">		consumer = <span class="keyword">new</span> KafkaConsumer&lt;&gt;(props); </span><br><span class="line">		<span class="keyword">this</span>.topic = topic; </span><br><span class="line">         <span class="comment">// 订阅消费主题</span></span><br><span class="line">		consumer.subscribe(Collections.singletonList(topic));</span><br><span class="line">		</span><br><span class="line">	&#125; </span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 循环拉取消息并进行消费，手工ACK方式</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(KafkaConsumer&lt;String, String&gt; consumer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 	拉取结果集(拉取超时时间为1秒)</span></span><br><span class="line">        	ConsumerRecords&lt;String, String&gt; records = consumer.poll(<span class="number">1000</span>);</span><br><span class="line">            <span class="comment">//  拉取结果集后获取具体消息的主题名称 分区位置 消息数量</span></span><br><span class="line">            <span class="keyword">for</span> (TopicPartition partition : records.partitions()) &#123;</span><br><span class="line">                List&lt;ConsumerRecord&lt;String, String&gt;&gt; partitionRecords = records.records(partition);</span><br><span class="line">                String topic = partition.topic();</span><br><span class="line">                <span class="keyword">int</span> size = partitionRecords.size();</span><br><span class="line">                log.info(<span class="string">"获取topic:&#123;&#125;,分区位置:&#123;&#125;,消息数为:&#123;&#125;"</span>, topic, partition.partition(), size);</span><br><span class="line">            	<span class="comment">// 分别对每个partition进行处理</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; size; i++) &#123;</span><br><span class="line">                	System.err.println(<span class="string">"-----&gt; value: "</span> + partitionRecords.get(i).value());</span><br><span class="line">                    <span class="keyword">long</span> offset = partitionRecords.get(i).offset() + <span class="number">1</span>;</span><br><span class="line">                	<span class="comment">// consumer.commitSync(); // 这种提交会自动获取partition 和 offset </span></span><br><span class="line">                     <span class="comment">// 这种是显示提交partition 和 offset 进度</span></span><br><span class="line">				   consumer.commitSync(Collections.singletonMap(partition, </span><br><span class="line">                                                            <span class="keyword">new</span> OffsetAndMetadata(offset)));</span><br><span class="line">                    log.info(<span class="string">"同步成功, topic: &#123;&#125;, 提交的 offset: &#123;&#125; "</span>, topic, offset);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">    <span class="comment">// 测试函数</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">		String topic = <span class="string">"topic1"</span>;</span><br><span class="line">		CollectKafkaConsumer collectKafkaConsumer = <span class="keyword">new</span> CollectKafkaConsumer(topic);</span><br><span class="line">		collectKafkaConsumer.receive(collectKafkaConsumer.consumer);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
-</ul>
-
+    
+    <a class="article-more-a" href="/2020/03/25/kafka实战/#more">more >></a>
+    
     
 
     
@@ -1291,107 +604,9 @@ D: 以上都不是</code></pre></li>
     <p>kafka核心概念与应用场景</p>
 <h3 id="Kafka的主要特点"><a href="#Kafka的主要特点" class="headerlink" title="Kafka的主要特点"></a>Kafka的主要特点</h3><hr>
 <p>Kafka是分布式发布-订阅消息系统。它最初由LinkedIn公司开发，之后成为Apache项目的一部分。Kafka是一个分布式的，可划分的，冗余备份的持久性的日志服务，它主要用于处理活跃的流式数据。</p>
-<ul>
-<li>kafka的主要特点：<ul>
-<li>同时为发布和订阅提供高吞吐量。据了解，Kafka每秒可以生产约25万消息（50 MB），每秒处理55万消息（110 MB）。</li>
-<li>可进行持久化操作。将消息持久化到磁盘，因此可用于批量消费，例如ETL，以及实时应用程序。通过将数据持久化到硬盘以及replication防止数据丢失。</li>
-<li>分布式系统，易于向外扩展。所有的producer、broker和consumer都会有多个，均为分布式的。无需停机即可扩展机器。</li>
-<li>消息被处理的状态是在consumer端维护，而不是由server端维护。当失败时能自动平衡。</li>
-<li>支持online和offline的场景。</li>
-</ul>
-</li>
-</ul>
-<h3 id="Kafka的架构"><a href="#Kafka的架构" class="headerlink" title="Kafka的架构"></a>Kafka的架构</h3><hr>
-<p>Kafka的整体架构非常简单，是显式分布式架构，producer、broker（kafka）和consumer都可以有多个。Producer，consumer实现Kafka注册的接口，数据从producer发送到broker，broker承担一个中间缓存和分发的作用。broker分发注册到系统中的consumer。broker的作用类似于缓存，即活跃的数据和离线处理系统之间的缓存。客户端和服务器端的通信，是基于简单，高性能，且与编程语言无关的TCP协议。</p>
-<ul>
-<li>基本概念：<ul>
-<li>Topic：特指Kafka处理的消息源（feeds of messages）的不同分类。</li>
-<li>Partition：Topic物理上的分组，一个topic可以分为多个partition，每个partition是一个有序的队列。partition中的每条消息都会被分配一个有序的id（offset）。</li>
-<li>Message：消息，是通信的基本单位，每个producer可以向一个topic（主题）发布一些消息。</li>
-<li>Producers：消息和数据生产者，向Kafka的一个topic发布消息的过程叫做producers。</li>
-<li>Consumers：消息和数据消费者，订阅topics并处理其发布的消息的过程叫做consumers。</li>
-<li>Broker：缓存代理，Kafka集群中的一台或多台服务器统称为broker。</li>
-</ul>
-</li>
-<li>发送消息的流程：<ul>
-<li>Producer根据指定的partition方法（round-robin、hash等），将消息发布到指定topic的partition里面</li>
-<li>kafka集群接收到Producer发过来的消息后，将其持久化到硬盘，并保留消息指定时长（可配置），而不关注消息是否被消费。</li>
-<li>Consumer从kafka集群pull数据，并控制获取消息的offset</li>
-</ul>
-</li>
-</ul>
-<h3 id="kafka的优秀设计"><a href="#kafka的优秀设计" class="headerlink" title="kafka的优秀设计"></a>kafka的优秀设计</h3><hr>
-<p>接下来我们从kafka的吞吐量、负载均衡、消息拉取、扩展性来说一说kafka的优秀设计。</p>
-<ul>
-<li>高吞吐是kafka需要实现的核心目标之一，为此kafka做了以下一些设计：<ul>
-<li>内存访问：直接使用 linux 文件系统的cache，来高效缓存数据，对数据进行读取和写入。</li>
-<li>数据磁盘持久化：消息不在内存中cache，直接写入到磁盘，充分利用磁盘的顺序读写性能。</li>
-<li>zero-copy：减少IO操作步骤<ul>
-<li>采用linux Zero-Copy提高发送性能。传统的数据发送需要发送4次上下文切换，采用sendfile系统调用之后，数据直接在内核态交换，系统上下文切换减少为2次。根据测试结果，可以提高60%的数据发送性能。Zero-Copy详细的技术细节可以参考：<a href="https://www.ibm.com/developerworks/linux/library/j-zerocopy/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/linux/library/j-zerocopy/</a></li>
-</ul>
-</li>
-<li>对消息的处理：<ul>
-<li>支持数据批量发送</li>
-<li>支持数据压缩机制</li>
-</ul>
-</li>
-<li>主题分区：<ul>
-<li>Topic划分为多个partition，提高生产/消费端处理消息的parallelism（并行度），数据在磁盘上存取代价为O(1)。kafka以topic来进行消息管理，每个topic包含多个part（ition），每个part对应一个逻辑log，有多个segment组成。每个segment中存储多条消息，消息id由其逻辑位置决定，即从消息id可直接定位到消息的存储位置，避免id到位置的额外映射。每个part在内存中对应一个index，记录每个segment中的第一条消息偏移。发布者发到某个topic的消息会被均匀的分布到多个part上（随机或根据用户指定的回调函数进行分布），broker收到发布消息往对应part的最后一个segment上添加该消息，当某个segment上的消息条数达到配置值或消息发布时间超过阈值时，segment上的消息会被flush到磁盘，只有flush到磁盘上的消息订阅者才能订阅到，segment达到一定的大小后将不会再往该segment写数据，broker会创建新的segment。</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>负载均衡：<ul>
-<li>producer根据用户指定的算法，将消息发送到指定的partition</li>
-<li>存在多个partiiton，每个partition有自己的replica，每个replica分布在不同的Broker节点上</li>
-<li>多个partition需要选取出lead partition，lead partition负责读写，并由zookeeper负责fail over</li>
-<li>通过zookeeper管理broker与consumer的动态加入与离开</li>
-</ul>
-</li>
-<li>消息的拉取：<ul>
-<li>简化kafka设计（由于kafka broker会持久化数据，broker没有内存压力，因此，consumer非常适合采取pull的方式消费数据）</li>
-<li>consumer根据消费能力自主控制消息拉取速度</li>
-<li>consumer根据自身情况自主选择消费模式，例如批量，重复消费，从尾端开始消费等</li>
-</ul>
-</li>
-<li>可扩展性<ul>
-<li>当需要增加broker结点时，新增的broker会向zookeeper注册，而producer及consumer会根据注册在zookeeper上的watcher感知这些变化，并及时作出调整。</li>
-</ul>
-</li>
-</ul>
-<h3 id="Kafka的应用场景"><a href="#Kafka的应用场景" class="headerlink" title="Kafka的应用场景"></a>Kafka的应用场景</h3><hr>
-<p>接下来，我们和小伙伴一起探讨一些kafka在实际工作中的一些重要应用场景，帮助小伙伴在以后的学习和工作里能够合理的运用kafka中间件服务于业务和架构设计。</p>
-<ul>
-<li>消息队列<ul>
-<li>比起大多数的消息系统来说，Kafka有更好的吞吐量，内置的分区，冗余及容错性，这让Kafka成为了一个很好的大规模消息处理应用的解决方案。消息系统一般吞吐量相对较低，但是需要更小的端到端延时，并常常依赖于Kafka提供的强大的持久性保障。在这个领域，Kafka足以媲美传统消息系统，如ActiveMQ或RabbitMQ。</li>
-</ul>
-</li>
-<li>行为跟踪<ul>
-<li>Kafka的另一个应用场景是跟踪用户浏览页面、搜索及其他行为，以发布-订阅的模式实时记录到对应的topic里。那么这些结果被订阅者拿到后，就可以做进一步的实时处理，或实时监控，或放到hadoop/离线数据仓库里处理。</li>
-</ul>
-</li>
-<li>元信息监控<ul>
-<li>作为操作记录的监控模块来使用，即汇集记录一些操作信息，可以理解为运维性质的数据监控吧。</li>
-</ul>
-</li>
-<li>日志收集<ul>
-<li>日志收集方面，其实开源产品有很多，包括Scribe、Apache Flume。很多人使用Kafka代替日志聚合（log aggregation）。日志聚合一般来说是从服务器上收集日志文件，然后放到一个集中的位置（文件服务器或HDFS）进行处理。然而Kafka忽略掉文件的细节，将其更清晰地抽象成一个个日志或事件的消息流。这就让Kafka处理过程延迟更低，更容易支持多数据源和分布式数据处理。比起以日志为中心的系统比如Scribe或者Flume来说，Kafka提供同样高效的性能和因为复制导致的更高的耐用性保证，以及更低的端到端延迟。</li>
-</ul>
-</li>
-<li>流处理<ul>
-<li>这个场景可能比较多，也很好理解。保存收集流数据，以提供之后对接的Storm或其他流式计算框架进行处理。很多用户会将那些从原始topic来的数据进行阶段性处理，汇总，扩充或者以其他的方式转换到新的topic下再继续后面的处理。例如一个文章推荐的处理流程，可能是先从RSS数据源中抓取文章的内容，然后将其丢入一个叫做“文章”的topic中；后续操作可能是需要对这个内容进行清理，比如回复正常数据或者删除重复数据，最后再将内容匹配的结果返还给用户。这就在一个独立的topic之外，产生了一系列的实时数据处理的流程。<a href="http://storm.incubator.apache.org/" target="_blank" rel="noopener">Strom</a>和<a href="http://samza.incubator.apache.org/" target="_blank" rel="noopener">Samza</a>是非常著名的实现这种类型数据转换的框架。</li>
-</ul>
-</li>
-<li>事件源<ul>
-<li>事件源是一种应用程序设计的方式，该方式的状态转移被记录为按时间顺序排序的记录序列。Kafka可以存储大量的日志数据，这使得它成为一个对这种方式的应用来说绝佳的后台。比如动态汇总（News feed）</li>
-</ul>
-</li>
-<li>持久性日志（commit log）<ul>
-<li>Kafka可以为一种外部的持久性日志的分布式系统提供服务。这种日志可以在节点间备份数据，并为故障节点数据回复提供一种重新同步的机制。Kafka中日志压缩功能为这种用法提供了条件。在这种用法中，Kafka类似于Apache BookKeeper项目。</li>
-</ul>
-</li>
-</ul>
-
+    
+    <a class="article-more-a" href="/2020/03/25/Kafka/#more">more >></a>
+    
     
 
     
@@ -1594,99 +809,6 @@ D: 以上都不是</code></pre></li>
     
     <p class="article-more-link">
       <a class="article-more-a" href="/2019/12/07/计算100的阶乘/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-NodeJS模拟数据实现登录" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2019/12/07/NodeJS模拟数据实现登录/" target="_blank">NodeJS模拟数据实现登录</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/2019/12/07/NodeJS模拟数据实现登录/" class="archive-article-date">
-        <time datetime="2019-12-07T11:45:05.483Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-12-07</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <p>原生nodeJS:</p>
-<p>与其他后台语言不同：</p>
-<p>​    <strong>优点</strong></p>
-<p>​    1.nodeJS的对象、语法与JavaScript一模一样，利于前端运用</p>
-<p>​    2.nodeJS性能不错  &lt;PHP，python，Java等&gt;</p>
-<p>​    3.前后台配合方面</p>
-    
-    <a class="article-more-a" href="/2019/12/07/NodeJS模拟数据实现登录/#more">more >></a>
-    
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">nodejs</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2019/12/07/NodeJS模拟数据实现登录/">展开全文 >></a>
     </p>
     
 
